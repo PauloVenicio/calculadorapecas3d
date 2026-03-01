@@ -2,10 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Calculadora 3D</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --bg: #f2f2f2;
     --card: #ffffff;
@@ -21,19 +26,21 @@ body.dark {
 }
 
 body {
+    margin: 0;
     font-family: Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
-    padding: 20px;
-    padding-bottom: 120px;
+    padding: 14px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
 }
 
 .card {
     background: var(--card);
-    padding: 20px;
-    border-radius: 16px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
     max-width: 480px;
-    margin: auto;
+    margin: 0 auto;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
@@ -49,19 +56,30 @@ body {
 
 h2 {
     text-align: center;
+    font-size: clamp(1.2rem, 5vw, 1.6rem);
+    margin: 8px 0 14px;
 }
 
 label {
     margin-top: 12px;
     display: block;
+    font-size: 0.95rem;
 }
 
 input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
+    min-height: 46px;
+    font-size: 16px;
     border-radius: 10px;
     border: 1px solid #ccc;
     margin-top: 5px;
+}
+
+body.dark input {
+    background: #2a2a2a;
+    border-color: #3f3f3f;
+    color: #fff;
 }
 
 .resultado {
@@ -77,12 +95,15 @@ body.dark .resultado {
 
 button {
     width: 100%;
-    padding: 12px;
+    padding: 13px 12px;
+    min-height: 48px;
+    font-size: 16px;
     margin-top: 10px;
     border-radius: 12px;
     border: none;
     font-weight: bold;
     cursor: pointer;
+    touch-action: manipulation;
 }
 
 .btn-primary { background: var(--primary); }
@@ -94,7 +115,7 @@ button {
     background: #ddd;
     padding: 10px;
     border-radius: 12px;
-    max-height: 150px;
+    max-height: min(32vh, 220px);
     overflow-y: auto;
 }
 
@@ -103,19 +124,33 @@ body.dark .historico {
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    margin-top: 14px;
     background: #000;
     color: #fff;
     text-align: center;
     padding: 10px;
     font-size: 14px;
+    border-radius: 10px;
 }
 
 body.dark footer {
     background: #111;
+}
+
+@media (min-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    footer {
+        max-width: 480px;
+        margin: 16px auto 0;
+    }
 }
 </style>
 </head>
