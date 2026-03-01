@@ -16,13 +16,6 @@
     --secondary: #2196f3;
 }
 
-body.light {
-    --bg: #f2f2f2;
-    --card: #ffffff;
-    --text: #222;
-    --primary: #2196f3;
-}
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -104,8 +97,6 @@ button {
 
 .btn-primary { background: var(--primary); color:#000; }
 .btn-danger { background: #f44336; color:#fff; }
-.btn-dark { background: var(--secondary); color:#fff; }
-
 .historico {
     margin-top: 15px;
     background: rgba(0,0,0,0.2);
@@ -113,6 +104,24 @@ button {
     border-radius: 12px;
     max-height: 200px;
     overflow-y: auto;
+}
+
+.historico-toggle {
+    margin-top: 12px;
+}
+
+.historico-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.historico-toggle input {
+    width: auto;
+    margin: 0;
+    padding: 0;
 }
 
 footer {
@@ -166,7 +175,12 @@ footer {
 
 <div class="historico" id="historico"></div>
 
-<button class="btn-dark" onclick="toggleModo()">Modo Claro / Escuro</button>
+<div class="historico-toggle">
+    <label for="mostrarHistorico">
+        <input type="checkbox" id="mostrarHistorico">
+        Mostrar histórico
+    </label>
+</div>
 
 </div>
 
@@ -175,10 +189,91 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 </footer>
 
 <script>
-let historico = JSON.parse(localStorage.getItem("historico3d")) || [];
-const LUCRO_FIXO = 120;
+const DB_NAME = "pcmaker3d_db";
+const DB_VERSION = 1;
+const STORE_HISTORICO = "historico";
+const LEGACY_KEY = "historico3d";
 
-function calcular() {
+let historico = [];
+const LUCRO_FIXO = 120;
+let db = null;
+
+function abrirBanco() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+            const database = event.target.result;
+            if (!database.objectStoreNames.contains(STORE_HISTORICO)) {
+                database.createObjectStore(STORE_HISTORICO, { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function carregarRegistrosDoBanco() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_HISTORICO, "readonly");
+        const store = transaction.objectStore(STORE_HISTORICO);
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            const itens = request.result || [];
+            itens.sort((a, b) => a.id - b.id);
+            resolve(itens.map(item => item.texto));
+        };
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function salvarRegistroNoBanco(texto) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_HISTORICO, "readwrite");
+        const store = transaction.objectStore(STORE_HISTORICO);
+        const request = store.add({ texto, criadoEm: new Date().toISOString() });
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function limparHistoricoNoBanco() {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_HISTORICO, "readwrite");
+        const store = transaction.objectStore(STORE_HISTORICO);
+        const request = store.clear();
+
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function migrarLocalStorageParaBanco() {
+    const legado = JSON.parse(localStorage.getItem(LEGACY_KEY)) || [];
+    if (!Array.isArray(legado) || legado.length === 0) return;
+
+    for (const item of legado) {
+        await salvarRegistroNoBanco(item);
+    }
+    localStorage.removeItem(LEGACY_KEY);
+}
+
+async function inicializarHistorico() {
+    try {
+        db = await abrirBanco();
+        await migrarLocalStorageParaBanco();
+        historico = await carregarRegistrosDoBanco();
+        atualizarHistorico();
+    } catch (erro) {
+        console.error("Erro ao abrir banco local:", erro);
+        alert("Não foi possível carregar o banco local de histórico neste navegador.");
+    }
+}
+
+async function calcular() {
     let nomeObjeto = nomeObjetoInput.value.trim();
     let peso = parseFloat(pesoInput.value);
     let tempo = parseFloat(tempoInput.value);
@@ -211,29 +306,25 @@ function calcular() {
     let nomeFormatado = nomeObjeto ? `${nomeObjeto} | ` : "";
     let registro = `${nomeFormatado}${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
 
+    await salvarRegistroNoBanco(registro);
     historico.push(registro);
-    localStorage.setItem("historico3d", JSON.stringify(historico));
     atualizarHistorico();
 }
 
 function atualizarHistorico() {
-    if (historico.length === 0) {
+    if (!mostrarHistoricoInput.checked || historico.length === 0) {
         historicoDiv.innerHTML = "";
         return;
     }
     historicoDiv.innerHTML = "<b>Histórico:</b><br>" + historico.join("<br>");
 }
 
-function limpar() {
+async function limpar() {
     document.querySelectorAll("input").forEach(i => i.value = "");
     resultado.innerHTML = "";
     historico = [];
-    localStorage.removeItem("historico3d");
+    await limparHistoricoNoBanco();
     atualizarHistorico();
-}
-
-function toggleModo() {
-    document.body.classList.toggle("light");
 }
 
 const pesoInput = document.getElementById("peso");
@@ -245,8 +336,11 @@ const energiaInput = document.getElementById("energia");
 const consumoInput = document.getElementById("consumo");
 const resultado = document.getElementById("resultado");
 const historicoDiv = document.getElementById("historico");
+const mostrarHistoricoInput = document.getElementById("mostrarHistorico");
 
-atualizarHistorico();
+mostrarHistoricoInput.addEventListener("change", atualizarHistorico);
+
+inicializarHistorico();
 </script>
 
 </body>
