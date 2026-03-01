@@ -3,26 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Calculadora 3D</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>PC Maker 3D - Calculadora</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 :root {
+    --bg: #0a0f1f;
+    --card: #111933;
+    --text: #ffffff;
+    --primary: #00f2ff;
+    --secondary: #2196f3;
+}
+
+body.light {
     --bg: #f2f2f2;
     --card: #ffffff;
     --text: #222;
-    --primary: #4caf50;
-}
-
-body.dark {
-    --bg: #121212;
-    --card: #1f1f1f;
-    --text: #ffffff;
-    --primary: #00c853;
+    --primary: #2196f3;
 }
 
 body {
@@ -31,131 +29,101 @@ body {
     background: var(--bg);
     color: var(--text);
     padding: 14px;
-    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+    padding-bottom: 120px;
 }
 
 .card {
     background: var(--card);
     width: 100%;
     padding: 16px;
-    border-radius: 14px;
+    border-radius: 16px;
     max-width: 480px;
     margin: 0 auto;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 0 20px var(--primary);
 }
 
 .logo-area {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .logo-area img {
-    max-width: 150px;
-    max-height: 100px;
+    max-width: 180px;
+    max-height: 120px;
 }
 
 h2 {
     text-align: center;
-    font-size: clamp(1.2rem, 5vw, 1.6rem);
-    margin: 8px 0 14px;
+    color: var(--primary);
 }
 
 label {
     margin-top: 12px;
     display: block;
-    font-size: 0.95rem;
 }
 
 input {
     width: 100%;
     padding: 12px;
-    min-height: 46px;
     font-size: 16px;
     border-radius: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #555;
     margin-top: 5px;
-}
-
-body.dark input {
-    background: #2a2a2a;
-    border-color: #3f3f3f;
-    color: #fff;
+    background: transparent;
+    color: var(--text);
 }
 
 .resultado {
     margin-top: 15px;
-    background: #e0e0e0;
-    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    padding: 12px;
     border-radius: 12px;
 }
 
-body.dark .resultado {
-    background: #333;
+.preco-final {
+    color: #00ff88;
+    font-size: 1.4em;
+    text-align: center;
 }
 
 button {
     width: 100%;
-    padding: 13px 12px;
-    min-height: 48px;
+    padding: 13px;
     font-size: 16px;
     margin-top: 10px;
     border-radius: 12px;
     border: none;
     font-weight: bold;
     cursor: pointer;
-    touch-action: manipulation;
 }
 
-.btn-primary { background: var(--primary); }
-.btn-sec { background: #2196f3; color: #fff; }
-.btn-danger { background: #f44336; color: #fff; }
+.btn-primary { background: var(--primary); color:#000; }
+.btn-danger { background: #f44336; color:#fff; }
+.btn-dark { background: var(--secondary); color:#fff; }
 
 .historico {
     margin-top: 15px;
-    background: #ddd;
+    background: rgba(0,0,0,0.2);
     padding: 10px;
     border-radius: 12px;
-    max-height: min(32vh, 220px);
+    max-height: 200px;
     overflow-y: auto;
 }
 
-body.dark .historico {
-    background: #2a2a2a;
-}
-
 footer {
-    margin-top: 14px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
     background: #000;
-    color: #fff;
+    color: var(--primary);
     text-align: center;
     padding: 10px;
     font-size: 14px;
-    border-radius: 10px;
-}
-
-body.dark footer {
-    background: #111;
-}
-
-@media (min-width: 768px) {
-    body {
-        padding: 20px;
-    }
-
-    .card {
-        padding: 20px;
-        border-radius: 16px;
-    }
-
-    footer {
-        max-width: 480px;
-        margin: 16px auto 0;
-    }
 }
 </style>
 </head>
 
-<body class="dark">
+<body>
 
 <div class="card">
 
@@ -163,7 +131,7 @@ body.dark footer {
     <img src="logo horizontal.png" alt="Sua Logomarca">
 </div>
 
-<h2>🖨️ Calculadora Impressão 3D</h2>
+<h2>🖨️ PC Maker 3D - Calculadora</h2>
 
 <label>Peso (g)</label>
 <input type="number" id="peso" step="0.01">
@@ -178,7 +146,7 @@ body.dark footer {
 <input type="number" id="custoHora" value="3">
 
 <label>Energia (R$/kWh)</label>
-<input type="number" id="energia" value="1">
+<input type="number" id="energia" value="0.90">
 
 <label>Consumo (kW)</label>
 <input type="number" id="consumo" value="0.15">
@@ -186,10 +154,11 @@ body.dark footer {
 <div class="resultado" id="resultado"></div>
 
 <button class="btn-primary" onclick="calcular()">Calcular</button>
-<button class="btn-sec" onclick="gerarPDF()">Gerar PDF</button>
 <button class="btn-danger" onclick="limpar()">Limpar</button>
 
 <div class="historico" id="historico"></div>
+
+<button class="btn-dark" onclick="toggleModo()">Modo Claro / Escuro</button>
 
 </div>
 
@@ -200,32 +169,31 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 <script>
 let historico = JSON.parse(localStorage.getItem("historico3d")) || [];
 const LUCRO_FIXO = 120;
+let modoClaro = false;
 
 function calcular() {
-    let peso = parseFloat(document.getElementById("peso").value);
-    let tempo = parseFloat(document.getElementById("tempo").value);
-    let precoKg = parseFloat(document.getElementById("precoKg").value);
-    let custoHora = parseFloat(document.getElementById("custoHora").value);
-    let energia = parseFloat(document.getElementById("energia").value);
-    let consumo = parseFloat(document.getElementById("consumo").value);
+    let peso = parseFloat(pesoInput.value);
+    let tempo = parseFloat(tempoInput.value);
+    let precoKg = parseFloat(precoKgInput.value);
+    let custoHora = parseFloat(custoHoraInput.value);
+    let energia = parseFloat(energiaInput.value);
+    let consumo = parseFloat(consumoInput.value);
 
     if(isNaN(peso) || isNaN(tempo)) return;
 
-    let precoGrama = precoKg / 1000;
-    let custoFilamento = peso * precoGrama;
+    let custoFilamento = (precoKg/1000) * peso;
     let custoMaquina = tempo * custoHora;
     let custoEnergia = tempo * consumo * energia;
     let custoTotal = custoFilamento + custoMaquina + custoEnergia;
-
     let precoFinal = custoTotal * (1 + LUCRO_FIXO/100);
 
-    document.getElementById("resultado").innerHTML = `
-        <p>Filamento: R$ ${custoFilamento.toFixed(2)}</p>
-        <p>Máquina: R$ ${custoMaquina.toFixed(2)}</p>
-        <p>Energia: R$ ${custoEnergia.toFixed(2)}</p>
+    resultado.innerHTML = `
+        <p>🧵 Filamento: R$ ${custoFilamento.toFixed(2)}</p>
+        <p>🖨 Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+        <p>⚡ Energia: R$ ${custoEnergia.toFixed(2)}</p>
         <p>Lucro fixo: ${LUCRO_FIXO}%</p>
         <hr>
-        <h3>Preço Final: R$ ${precoFinal.toFixed(2)}</h3>
+        <div class="preco-final">💰 Preço Final: R$ ${precoFinal.toFixed(2)}</div>
     `;
 
     let registro = `${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
@@ -235,25 +203,30 @@ function calcular() {
 }
 
 function atualizarHistorico() {
-    document.getElementById("historico").innerHTML =
-        "<b>Histórico:</b><br>" + historico.join("<br>");
+    historicoDiv.innerHTML = "<b>Histórico:</b><br>" + historico.join("<br>");
 }
 
 function limpar() {
     document.querySelectorAll("input").forEach(i => i.value = "");
-    document.getElementById("resultado").innerHTML = "";
+    resultado.innerHTML = "";
     historico = [];
     localStorage.removeItem("historico3d");
     atualizarHistorico();
 }
 
-function gerarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text("Orçamento Impressão 3D", 20, 20);
-    doc.text(document.getElementById("resultado").innerText, 20, 40);
-    doc.save("orcamento3d.pdf");
+function toggleModo() {
+    modoClaro = !modoClaro;
+    document.body.classList.toggle("light");
 }
+
+const pesoInput = document.getElementById("peso");
+const tempoInput = document.getElementById("tempo");
+const precoKgInput = document.getElementById("precoKg");
+const custoHoraInput = document.getElementById("custoHora");
+const energiaInput = document.getElementById("energia");
+const consumoInput = document.getElementById("consumo");
+const resultado = document.getElementById("resultado");
+const historicoDiv = document.getElementById("historico");
 
 document.querySelectorAll("input").forEach(i=>{
     i.addEventListener("input", calcular);
