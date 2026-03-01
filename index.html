@@ -80,6 +80,11 @@ input {
     border-radius: 12px;
 }
 
+.resultado:empty,
+.historico:empty {
+    display: none;
+}
+
 .preco-final {
     color: #00ff88;
     font-size: 1.4em;
@@ -133,22 +138,25 @@ footer {
 
 <h2>🖨️ PC Maker 3D - Calculadora</h2>
 
-<label>Peso (g)</label>
+<label>Nome do objeto:</label>
+<input type="text" id="nomeObjeto" placeholder="Ex.: Suporte de celular">
+
+<label>Peso (g):</label>
 <input type="number" id="peso" step="0.01">
 
-<label>Tempo (horas)</label>
+<label>Tempo (horas):</label>
 <input type="number" id="tempo" step="0.1">
 
-<label>Preço do filamento (R$/kg)</label>
+<label>Preço do filamento (R$/kg):</label>
 <input type="number" id="precoKg" value="120">
 
-<label>Custo da máquina (R$/hora)</label>
+<label>Custo da máquina (R$/hora):</label>
 <input type="number" id="custoHora" value="3">
 
-<label>Energia (R$/kWh)</label>
+<label>Energia (R$/kWh):</label>
 <input type="number" id="energia" value="0.90">
 
-<label>Consumo (kW)</label>
+<label>Consumo (kW):</label>
 <input type="number" id="consumo" value="0.15">
 
 <div class="resultado" id="resultado"></div>
@@ -169,9 +177,9 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 <script>
 let historico = JSON.parse(localStorage.getItem("historico3d")) || [];
 const LUCRO_FIXO = 120;
-let modoClaro = false;
 
 function calcular() {
+    let nomeObjeto = nomeObjetoInput.value.trim();
     let peso = parseFloat(pesoInput.value);
     let tempo = parseFloat(tempoInput.value);
     let precoKg = parseFloat(precoKgInput.value);
@@ -179,30 +187,40 @@ function calcular() {
     let energia = parseFloat(energiaInput.value);
     let consumo = parseFloat(consumoInput.value);
 
-    if(isNaN(peso) || isNaN(tempo)) return;
+    if (isNaN(peso) || isNaN(tempo)) {
+        alert("Preencha peso e tempo corretamente.");
+        return;
+    }
 
-    let custoFilamento = (precoKg/1000) * peso;
+    let custoFilamento = (precoKg / 1000) * peso;
     let custoMaquina = tempo * custoHora;
     let custoEnergia = tempo * consumo * energia;
     let custoTotal = custoFilamento + custoMaquina + custoEnergia;
-    let precoFinal = custoTotal * (1 + LUCRO_FIXO/100);
+    let precoFinal = custoTotal * (1 + LUCRO_FIXO / 100);
 
     resultado.innerHTML = `
+        <p><strong>📦 Produto:</strong> ${nomeObjeto || "Sem nome"}</p>
         <p>🧵 Filamento: R$ ${custoFilamento.toFixed(2)}</p>
-        <p>🖨 Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+        <p>🖨️ Máquina: R$ ${custoMaquina.toFixed(2)}</p>
         <p>⚡ Energia: R$ ${custoEnergia.toFixed(2)}</p>
         <p>Lucro fixo: ${LUCRO_FIXO}%</p>
         <hr>
         <div class="preco-final">💰 Preço Final: R$ ${precoFinal.toFixed(2)}</div>
     `;
 
-    let registro = `${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
+    let nomeFormatado = nomeObjeto ? `${nomeObjeto} | ` : "";
+    let registro = `${nomeFormatado}${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
+
     historico.push(registro);
     localStorage.setItem("historico3d", JSON.stringify(historico));
     atualizarHistorico();
 }
 
 function atualizarHistorico() {
+    if (historico.length === 0) {
+        historicoDiv.innerHTML = "";
+        return;
+    }
     historicoDiv.innerHTML = "<b>Histórico:</b><br>" + historico.join("<br>");
 }
 
@@ -215,11 +233,11 @@ function limpar() {
 }
 
 function toggleModo() {
-    modoClaro = !modoClaro;
     document.body.classList.toggle("light");
 }
 
 const pesoInput = document.getElementById("peso");
+const nomeObjetoInput = document.getElementById("nomeObjeto");
 const tempoInput = document.getElementById("tempo");
 const precoKgInput = document.getElementById("precoKg");
 const custoHoraInput = document.getElementById("custoHora");
@@ -227,10 +245,6 @@ const energiaInput = document.getElementById("energia");
 const consumoInput = document.getElementById("consumo");
 const resultado = document.getElementById("resultado");
 const historicoDiv = document.getElementById("historico");
-
-document.querySelectorAll("input").forEach(i=>{
-    i.addEventListener("input", calcular);
-});
 
 atualizarHistorico();
 </script>
