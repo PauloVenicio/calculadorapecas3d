@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Calculadora 3D</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root {
+    --bg: #f2f2f2;
+    --card: #ffffff;
+    --text: #222;
+    --primary: #4caf50;
+}
+
+body.dark {
+    --bg: #121212;
+    --card: #1f1f1f;
+    --text: #ffffff;
+    --primary: #00c853;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+    padding-bottom: 120px;
+}
+
+.card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 16px;
+    max-width: 480px;
+    margin: auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.logo-area {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.logo-area img {
+    max-width: 150px;
+    max-height: 100px;
+}
+
+h2 {
+    text-align: center;
+}
+
+label {
+    margin-top: 12px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+}
+
+.resultado {
+    margin-top: 15px;
+    background: #e0e0e0;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+body.dark .resultado {
+    background: #333;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-primary { background: var(--primary); }
+.btn-sec { background: #2196f3; color: #fff; }
+.btn-danger { background: #f44336; color: #fff; }
+
+.historico {
+    margin-top: 15px;
+    background: #ddd;
+    padding: 10px;
+    border-radius: 12px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+body.dark .historico {
+    background: #2a2a2a;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+}
+
+body.dark footer {
+    background: #111;
+}
+</style>
+</head>
+
+<body class="dark">
+
+<div class="card">
+
+<div class="logo-area">
+    <img src="logo horizontal.png" alt="Sua Logomarca">
+</div>
+
+<h2>🖨️ Calculadora Impressão 3D</h2>
+
+<label>Peso (g)</label>
+<input type="number" id="peso" step="0.01">
+
+<label>Tempo (horas)</label>
+<input type="number" id="tempo" step="0.1">
+
+<label>Preço do filamento (R$/kg)</label>
+<input type="number" id="precoKg" value="120">
+
+<label>Custo da máquina (R$/hora)</label>
+<input type="number" id="custoHora" value="3">
+
+<label>Energia (R$/kWh)</label>
+<input type="number" id="energia" value="1">
+
+<label>Consumo (kW)</label>
+<input type="number" id="consumo" value="0.15">
+
+<div class="resultado" id="resultado"></div>
+
+<button class="btn-primary" onclick="calcular()">Calcular</button>
+<button class="btn-sec" onclick="gerarPDF()">Gerar PDF</button>
+<button class="btn-danger" onclick="limpar()">Limpar</button>
+
+<div class="historico" id="historico"></div>
+
+</div>
+
+<footer>
+Paulo Carvalho 2026 - Todos os direitos reservados.
+</footer>
+
+<script>
+let historico = JSON.parse(localStorage.getItem("historico3d")) || [];
+const LUCRO_FIXO = 120;
+
+function calcular() {
+    let peso = parseFloat(document.getElementById("peso").value);
+    let tempo = parseFloat(document.getElementById("tempo").value);
+    let precoKg = parseFloat(document.getElementById("precoKg").value);
+    let custoHora = parseFloat(document.getElementById("custoHora").value);
+    let energia = parseFloat(document.getElementById("energia").value);
+    let consumo = parseFloat(document.getElementById("consumo").value);
+
+    if(isNaN(peso) || isNaN(tempo)) return;
+
+    let precoGrama = precoKg / 1000;
+    let custoFilamento = peso * precoGrama;
+    let custoMaquina = tempo * custoHora;
+    let custoEnergia = tempo * consumo * energia;
+    let custoTotal = custoFilamento + custoMaquina + custoEnergia;
+
+    let precoFinal = custoTotal * (1 + LUCRO_FIXO/100);
+
+    document.getElementById("resultado").innerHTML = `
+        <p>Filamento: R$ ${custoFilamento.toFixed(2)}</p>
+        <p>Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+        <p>Energia: R$ ${custoEnergia.toFixed(2)}</p>
+        <p>Lucro fixo: ${LUCRO_FIXO}%</p>
+        <hr>
+        <h3>Preço Final: R$ ${precoFinal.toFixed(2)}</h3>
+    `;
+
+    let registro = `${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
+    historico.push(registro);
+    localStorage.setItem("historico3d", JSON.stringify(historico));
+    atualizarHistorico();
+}
+
+function atualizarHistorico() {
+    document.getElementById("historico").innerHTML =
+        "<b>Histórico:</b><br>" + historico.join("<br>");
+}
+
+function limpar() {
+    document.querySelectorAll("input").forEach(i => i.value = "");
+    document.getElementById("resultado").innerHTML = "";
+    historico = [];
+    localStorage.removeItem("historico3d");
+    atualizarHistorico();
+}
+
+function gerarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Orçamento Impressão 3D", 20, 20);
+    doc.text(document.getElementById("resultado").innerText, 20, 40);
+    doc.save("orcamento3d.pdf");
+}
+
+document.querySelectorAll("input").forEach(i=>{
+    i.addEventListener("input", calcular);
+});
+
+atualizarHistorico();
+</script>
+
+</body>
+</html>
