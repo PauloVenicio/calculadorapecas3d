@@ -3,137 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Venix3D - Calculadora</title>
+
+<title>Venix3D - Sistema 3D</title>
 
 <style>
-* { box-sizing: border-box; }
 
-:root {
-    --bg: #0a0f1f;
-    --card: #111933;
-    --text: #ffffff;
-    --primary: #00f2ff;
-    --secondary: #2196f3;
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 14px;
-    padding-bottom: 120px;
+:root{
+    --bg:#0a0f1f;
+    --card:#111933;
+    --text:#ffffff;
+    --primary:#00f2ff;
+    --secondary:#2196f3;
 }
 
-.card {
-    background: var(--card);
-    width: 100%;
-    padding: 16px;
-    border-radius: 16px;
-    max-width: 480px;
-    margin: 0 auto;
-    box-shadow: 0 0 20px var(--primary);
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:14px;
+    padding-bottom:120px;
 }
 
-.logo-area {
-    text-align: center;
-    margin-bottom: 10px;
+.card{
+    background:var(--card);
+    width:100%;
+    padding:16px;
+    border-radius:16px;
+    max-width:520px;
+    margin:0 auto;
+    box-shadow:0 0 20px var(--primary);
 }
 
-.logo-area img {
-    max-width: 180px;
-    max-height: 120px;
+.logo-area{
+    text-align:center;
+    margin-bottom:10px;
 }
 
-h2 {
-    text-align: center;
-    color: var(--primary);
+.logo-area img{
+    max-width:180px;
+    max-height:120px;
 }
 
-label {
-    margin-top: 12px;
-    display: block;
+h2{
+    text-align:center;
+    color:var(--primary);
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: 1px solid #555;
-    margin-top: 5px;
-    background: transparent;
-    color: var(--text);
+label{
+    margin-top:12px;
+    display:block;
 }
 
-.resultado {
-    margin-top: 15px;
-    background: rgba(0,0,0,0.2);
-    padding: 12px;
-    border-radius: 12px;
+input,
+select{
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    border-radius:10px;
+    border:1px solid #555;
+    margin-top:5px;
+    background:transparent;
+    color:var(--text);
+}
+
+select option{
+    background:#111933;
+}
+
+.resultado{
+    margin-top:15px;
+    background:rgba(0,0,0,0.2);
+    padding:12px;
+    border-radius:12px;
 }
 
 .resultado:empty,
-.historico:empty {
-    display: none;
+.historico:empty{
+    display:none;
 }
 
-.preco-final {
-    color: #00ff88;
-    font-size: 1.4em;
-    text-align: center;
+.preco-final{
+    color:#00ff88;
+    font-size:1.4em;
+    text-align:center;
 }
 
-button {
-    width: 100%;
-    padding: 13px;
-    font-size: 16px;
-    margin-top: 10px;
-    border-radius: 12px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+button{
+    width:100%;
+    padding:13px;
+    font-size:16px;
+    margin-top:10px;
+    border-radius:12px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.btn-primary { background: var(--primary); color:#000; }
-.btn-danger { background: #f44336; color:#fff; }
-.historico {
-    margin-top: 15px;
-    background: rgba(0,0,0,0.2);
-    padding: 10px;
-    border-radius: 12px;
-    max-height: 200px;
-    overflow-y: auto;
+.btn-primary{
+    background:var(--primary);
+    color:#000;
 }
 
-.historico-toggle {
-    margin-top: 12px;
+.btn-danger{
+    background:#f44336;
+    color:#fff;
 }
 
-.historico-toggle label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    cursor: pointer;
+.toggle-lucro{
+    background:#1b274d;
+    color:#00f2ff;
+    border:1px solid #00f2ff;
+    margin-top:8px;
+    padding:10px;
+    font-size:14px;
 }
 
-.historico-toggle input {
-    width: auto;
-    margin: 0;
-    padding: 0;
+.lucro-box{
+    margin-top:10px;
+    background:rgba(0,242,255,0.08);
+    padding:10px;
+    border-radius:10px;
+    animation:fadeIn 0.25s ease;
 }
 
-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #000;
-    color: var(--primary);
-    text-align: center;
-    padding: 10px;
-    font-size: 14px;
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(-5px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
+
+.historico{
+    margin-top:15px;
+    background:rgba(0,0,0,0.2);
+    padding:10px;
+    border-radius:12px;
+    max-height:300px;
+    overflow-y:auto;
+}
+
+.historico-toggle{
+    margin-top:12px;
+}
+
+.historico-toggle label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    cursor:pointer;
+}
+
+.historico-toggle input{
+    width:auto;
+    margin:0;
+    padding:0;
+}
+
+.social-links{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+}
+
+.social-links a{
+    flex:1;
+    text-align:center;
+    text-decoration:none;
+    padding:14px;
+    border-radius:12px;
+    font-weight:bold;
+    color:white;
+    transition:0.3s;
+}
+
+.social-links a:hover{
+    transform:scale(1.03);
+}
+
+.instagram{
+    background:linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045);
+}
+
+.whatsapp{
+    background:#25D366;
+}
+
+.filamento-card{
+    background:#0d1429;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:10px;
+    border:1px solid #1c274d;
+}
+
+footer{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#000;
+    color:var(--primary);
+    text-align:center;
+    padding:10px;
+    font-size:14px;
+}
+
+hr{
+    border-color:#333;
+    margin:20px 0;
+}
+
 </style>
 </head>
 
@@ -142,10 +231,10 @@ footer {
 <div class="card">
 
 <div class="logo-area">
-    <img src="logo horizontal.png" alt="Sua Logomarca">
+    <img src="logo horizontal.png" alt="Logo Venix3D">
 </div>
 
-<h2>🖨️ Venix3D - Calculadora 💰</h2>
+<h2>🖨️ Venix3D - Sistema 3D 💰</h2>
 
 <label>Nome do objeto:</label>
 <input type="text" id="nomeObjeto" placeholder="Ex.: Suporte de celular">
@@ -157,21 +246,26 @@ footer {
 <input type="number" id="tempo" step="0.1">
 
 <label>Preço do filamento (R$/kg):</label>
-<input type="number" id="precoKg" value="120">
+<input type="number" id="precoKg" value="130">
 
 <label>Custo da máquina (R$/hora):</label>
-<input type="number" id="custoHora" value="3">
+<input type="number" id="custoHora" value="4">
 
 <label>Energia (R$/kWh):</label>
-<input type="number" id="energia" value="1.18">
+<input type="number" id="energia" value="1.28">
 
 <label>Consumo (kW):</label>
 <input type="number" id="consumo" value="0.19">
 
 <div class="resultado" id="resultado"></div>
 
-<button class="btn-primary" onclick="calcular()">Calcular</button>
-<button class="btn-danger" onclick="limpar()">Limpar</button>
+<button class="btn-primary" onclick="calcular()">
+    Calcular
+</button>
+
+<button class="btn-danger" onclick="limparHistorico()">
+    Limpar Histórico
+</button>
 
 <div class="historico" id="historico"></div>
 
@@ -182,6 +276,51 @@ footer {
     </label>
 </div>
 
+<hr>
+
+<h2>📦 Estoque de Filamentos</h2>
+
+<label>Nome do filamento:</label>
+<input type="text" id="filamentoNome" placeholder="Ex.: PLA Preto">
+
+<label>Material:</label>
+<input type="text" id="filamentoMaterial" placeholder="PLA / PETG / ABS">
+
+<label>Peso restante (g):</label>
+<input type="number" id="filamentoPeso">
+
+<label>Status:</label>
+<select id="filamentoStatus">
+    <option value="Lacrado">Lacrado</option>
+    <option value="Aberto">Aberto</option>
+</select>
+
+<button class="btn-primary" onclick="salvarFilamento()">
+    Salvar Filamento
+</button>
+
+<div class="historico" id="estoqueFilamentos"></div>
+
+<hr>
+
+<div class="social-links">
+
+    <a 
+    href="https://www.instagram.com/venix3d/"
+    target="_blank"
+    class="instagram">
+        📸 Instagram
+    </a>
+
+    <a 
+    href="https://chat.whatsapp.com/GvUt2Y9shbt6mIBLmzPBJR"
+    target="_blank"
+    class="whatsapp">
+        💬 WhatsApp
+    </a>
+
+</div>
+
 </div>
 
 <footer>
@@ -189,158 +328,295 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 </footer>
 
 <script>
-const DB_NAME = "pcmaker3d_db";
-const DB_VERSION = 1;
+
+const DB_NAME = "venix3d_db";
+const DB_VERSION = 2;
+
 const STORE_HISTORICO = "historico";
-const LEGACY_KEY = "historico3d";
+const STORE_FILAMENTOS = "filamentos";
 
-let historico = [];
 const LUCRO_FIXO = 120;
+
 let db = null;
+let historico = [];
 
-function abrirBanco() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
+async function abrirBanco(){
 
-        request.onupgradeneeded = (event) => {
+    return new Promise((resolve,reject)=>{
+
+        const request = indexedDB.open(DB_NAME,DB_VERSION);
+
+        request.onupgradeneeded = (event)=>{
+
             const database = event.target.result;
-            if (!database.objectStoreNames.contains(STORE_HISTORICO)) {
-                database.createObjectStore(STORE_HISTORICO, { keyPath: "id", autoIncrement: true });
+
+            if(!database.objectStoreNames.contains(STORE_HISTORICO)){
+
+                database.createObjectStore(STORE_HISTORICO,{
+                    keyPath:"id",
+                    autoIncrement:true
+                });
+            }
+
+            if(!database.objectStoreNames.contains(STORE_FILAMENTOS)){
+
+                database.createObjectStore(STORE_FILAMENTOS,{
+                    keyPath:"id",
+                    autoIncrement:true
+                });
             }
         };
 
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        request.onsuccess = ()=>resolve(request.result);
+
+        request.onerror = ()=>reject(request.error);
     });
 }
 
-function carregarRegistrosDoBanco() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_HISTORICO, "readonly");
-        const store = transaction.objectStore(STORE_HISTORICO);
-        const request = store.getAll();
+async function inicializar(){
 
-        request.onsuccess = () => {
-            const itens = request.result || [];
-            itens.sort((a, b) => a.id - b.id);
-            resolve(itens.map(item => item.texto));
-        };
-        request.onerror = () => reject(request.error);
-    });
+    db = await abrirBanco();
+
+    carregarHistorico();
+
+    carregarFilamentos();
 }
 
-function salvarRegistroNoBanco(texto) {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_HISTORICO, "readwrite");
-        const store = transaction.objectStore(STORE_HISTORICO);
-        const request = store.add({ texto, criadoEm: new Date().toISOString() });
+function toggleLucro(botao){
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
+    const box = botao.nextElementSibling;
 
-function limparHistoricoNoBanco() {
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_HISTORICO, "readwrite");
-        const store = transaction.objectStore(STORE_HISTORICO);
-        const request = store.clear();
+    if(box.style.display === "none"){
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
+        box.style.display = "block";
 
-async function migrarLocalStorageParaBanco() {
-    const legado = JSON.parse(localStorage.getItem(LEGACY_KEY)) || [];
-    if (!Array.isArray(legado) || legado.length === 0) return;
+        botao.innerHTML = "🙈 Ocultar lucro";
 
-    for (const item of legado) {
-        await salvarRegistroNoBanco(item);
-    }
-    localStorage.removeItem(LEGACY_KEY);
-}
+    }else{
 
-async function inicializarHistorico() {
-    try {
-        db = await abrirBanco();
-        await migrarLocalStorageParaBanco();
-        historico = await carregarRegistrosDoBanco();
-        atualizarHistorico();
-    } catch (erro) {
-        console.error("Erro ao abrir banco local:", erro);
-        alert("Não foi possível carregar o banco local de histórico neste navegador.");
+        box.style.display = "none";
+
+        botao.innerHTML = "👁️ Mostrar lucro";
     }
 }
 
-async function calcular() {
-    let nomeObjeto = nomeObjetoInput.value.trim();
-    let peso = parseFloat(pesoInput.value);
-    let tempo = parseFloat(tempoInput.value);
-    let precoKg = parseFloat(precoKgInput.value);
-    let custoHora = parseFloat(custoHoraInput.value);
-    let energia = parseFloat(energiaInput.value);
-    let consumo = parseFloat(consumoInput.value);
+async function calcular(){
 
-    if (isNaN(peso) || isNaN(tempo)) {
+    let nomeObjeto = document.getElementById("nomeObjeto").value.trim();
+
+    let peso = parseFloat(document.getElementById("peso").value);
+
+    let tempo = parseFloat(document.getElementById("tempo").value);
+
+    let precoKg = parseFloat(document.getElementById("precoKg").value);
+
+    let custoHora = parseFloat(document.getElementById("custoHora").value);
+
+    let energia = parseFloat(document.getElementById("energia").value);
+
+    let consumo = parseFloat(document.getElementById("consumo").value);
+
+    if(isNaN(peso) || isNaN(tempo)){
+
         alert("Preencha peso e tempo corretamente.");
+
         return;
     }
 
     let custoFilamento = (precoKg / 1000) * peso;
+
     let custoMaquina = tempo * custoHora;
+
     let custoEnergia = tempo * consumo * energia;
+
     let custoTotal = custoFilamento + custoMaquina + custoEnergia;
+
     let precoFinal = custoTotal * (1 + LUCRO_FIXO / 100);
 
-    resultado.innerHTML = `
+    document.getElementById("resultado").innerHTML = `
+    
         <p><strong>📦 Produto:</strong> ${nomeObjeto || "Sem nome"}</p>
+
         <p>🧵 Filamento: R$ ${custoFilamento.toFixed(2)}</p>
+
         <p>🖨️ Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+
         <p>⚡ Energia: R$ ${custoEnergia.toFixed(2)}</p>
-        <p>Lucro fixo: ${LUCRO_FIXO}%</p>
+
+        <button 
+        class="toggle-lucro"
+        onclick="toggleLucro(this)">
+            👁️ Mostrar lucro
+        </button>
+
+        <div class="lucro-box" style="display:none;">
+            <p>📈 Lucro fixo: ${LUCRO_FIXO}%</p>
+        </div>
+
         <hr>
-        <div class="preco-final">💰 Preço Final: R$ ${precoFinal.toFixed(2)}</div>
+
+        <div class="preco-final">
+            💰 Preço Final: R$ ${precoFinal.toFixed(2)}
+        </div>
     `;
 
-    let nomeFormatado = nomeObjeto ? `${nomeObjeto} | ` : "";
-    let registro = `${nomeFormatado}${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`;
+    let registro = {
+        texto: `${nomeObjeto || "Sem nome"} | ${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`,
+        criadoEm:new Date().toISOString()
+    };
 
-    await salvarRegistroNoBanco(registro);
-    historico.push(registro);
-    atualizarHistorico();
+    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
+
+    const store = transaction.objectStore(STORE_HISTORICO);
+
+    store.add(registro);
+
+    carregarHistorico();
 }
 
-function atualizarHistorico() {
-    if (!mostrarHistoricoInput.checked || historico.length === 0) {
-        historicoDiv.innerHTML = "";
+async function carregarHistorico(){
+
+    const transaction = db.transaction(STORE_HISTORICO,"readonly");
+
+    const store = transaction.objectStore(STORE_HISTORICO);
+
+    const request = store.getAll();
+
+    request.onsuccess = ()=>{
+
+        historico = request.result;
+
+        atualizarHistorico();
+    };
+}
+
+function atualizarHistorico(){
+
+    const mostrar = document.getElementById("mostrarHistorico").checked;
+
+    const div = document.getElementById("historico");
+
+    if(!mostrar || historico.length === 0){
+
+        div.innerHTML = "";
+
         return;
     }
-    historicoDiv.innerHTML = "<b>Histórico:</b><br>" + historico.join("<br>");
+
+    div.innerHTML = "<b>📜 Histórico:</b><br><br>";
+
+    historico.reverse().forEach(item=>{
+
+        div.innerHTML += `
+            • ${item.texto}<br><br>
+        `;
+    });
 }
 
-async function limpar() {
-    document.querySelectorAll("input").forEach(i => i.value = "");
-    resultado.innerHTML = "";
+async function limparHistorico(){
+
+    if(!confirm("Deseja apagar o histórico?")) return;
+
+    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
+
+    const store = transaction.objectStore(STORE_HISTORICO);
+
+    store.clear();
+
     historico = [];
-    await limparHistoricoNoBanco();
+
     atualizarHistorico();
+
+    document.getElementById("resultado").innerHTML = "";
 }
 
-const pesoInput = document.getElementById("peso");
-const nomeObjetoInput = document.getElementById("nomeObjeto");
-const tempoInput = document.getElementById("tempo");
-const precoKgInput = document.getElementById("precoKg");
-const custoHoraInput = document.getElementById("custoHora");
-const energiaInput = document.getElementById("energia");
-const consumoInput = document.getElementById("consumo");
-const resultado = document.getElementById("resultado");
-const historicoDiv = document.getElementById("historico");
-const mostrarHistoricoInput = document.getElementById("mostrarHistorico");
+async function salvarFilamento(){
 
-mostrarHistoricoInput.addEventListener("change", atualizarHistorico);
+    let nome = document.getElementById("filamentoNome").value;
 
-inicializarHistorico();
+    let material = document.getElementById("filamentoMaterial").value;
+
+    let peso = document.getElementById("filamentoPeso").value;
+
+    let status = document.getElementById("filamentoStatus").value;
+
+    if(!nome || !material || !peso){
+
+        alert("Preencha todos os dados.");
+
+        return;
+    }
+
+    const transaction = db.transaction(STORE_FILAMENTOS,"readwrite");
+
+    const store = transaction.objectStore(STORE_FILAMENTOS);
+
+    store.add({
+        nome,
+        material,
+        peso,
+        status,
+        criadoEm:new Date().toISOString()
+    });
+
+    document.getElementById("filamentoNome").value = "";
+
+    document.getElementById("filamentoMaterial").value = "";
+
+    document.getElementById("filamentoPeso").value = "";
+
+    carregarFilamentos();
+}
+
+async function carregarFilamentos(){
+
+    const transaction = db.transaction(STORE_FILAMENTOS,"readonly");
+
+    const store = transaction.objectStore(STORE_FILAMENTOS);
+
+    const request = store.getAll();
+
+    request.onsuccess = ()=>{
+
+        const itens = request.result;
+
+        const div = document.getElementById("estoqueFilamentos");
+
+        if(itens.length === 0){
+
+            div.innerHTML = "";
+
+            return;
+        }
+
+        div.innerHTML = "<b>📦 Estoque Atual:</b><br><br>";
+
+        itens.reverse().forEach(item=>{
+
+            div.innerHTML += `
+            
+            <div class="filamento-card">
+
+                <b>${item.nome}</b><br><br>
+
+                🧵 Material: ${item.material}<br>
+
+                ⚖️ Peso: ${item.peso}g<br>
+
+                📌 Status: ${item.status}
+
+            </div>
+            `;
+        });
+    };
+}
+
+document
+.getElementById("mostrarHistorico")
+.addEventListener("change", atualizarHistorico);
+
+inicializar();
+
 </script>
 
 </body>
