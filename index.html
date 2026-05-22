@@ -17,7 +17,6 @@
     --card:#111933;
     --text:#ffffff;
     --primary:#00f2ff;
-    --secondary:#2196f3;
 }
 
 body{
@@ -128,18 +127,6 @@ button{
     background:rgba(0,242,255,0.08);
     padding:10px;
     border-radius:10px;
-    animation:fadeIn 0.25s ease;
-}
-
-@keyframes fadeIn{
-    from{
-        opacity:0;
-        transform:translateY(-5px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
 }
 
 .historico{
@@ -200,10 +187,38 @@ button{
 
 .filamento-card{
     background:#0d1429;
-    padding:12px;
+    padding:14px;
     border-radius:12px;
     margin-bottom:10px;
     border:1px solid #1c274d;
+    position:relative;
+}
+
+.btn-lixeira{
+    background:#1c274d;
+    color:#ff4d4d;
+    border:1px solid #ff4d4d;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    position:absolute;
+    top:10px;
+    right:10px;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:0.25s;
+    padding:0;
+    box-shadow:0 0 8px rgba(255,77,77,0.25);
+}
+
+.btn-lixeira:hover{
+    background:#ff4d4d;
+    color:#fff;
+    transform:scale(1.08);
+    box-shadow:0 0 12px rgba(255,77,77,0.45);
 }
 
 footer{
@@ -223,6 +238,11 @@ hr{
     margin:20px 0;
 }
 
+/* MATERIAL SEMPRE MAIÚSCULO */
+#filamentoMaterial{
+    text-transform:uppercase;
+}
+
 </style>
 </head>
 
@@ -231,7 +251,7 @@ hr{
 <div class="card">
 
 <div class="logo-area">
-    <img src="logo horizontal.jpg"
+    <img src="logo horizontal.jpg">
 </div>
 
 <h2>🖨️ Venix3D - Sistema 3D 💰</h2>
@@ -284,7 +304,11 @@ hr{
 <input type="text" id="filamentoNome" placeholder="Ex.: PLA Preto">
 
 <label>Material:</label>
-<input type="text" id="filamentoMaterial" placeholder="PLA / PETG / ABS">
+<input 
+type="text" 
+id="filamentoMaterial" 
+placeholder="PLA / PETG / ABS"
+>
 
 <label>Peso restante (g):</label>
 <input type="number" id="filamentoPeso">
@@ -382,24 +406,6 @@ async function inicializar(){
     carregarFilamentos();
 }
 
-function toggleLucro(botao){
-
-    const box = botao.nextElementSibling;
-
-    if(box.style.display === "none"){
-
-        box.style.display = "block";
-
-        botao.innerHTML = "🙈 Ocultar lucro";
-
-    }else{
-
-        box.style.display = "none";
-
-        botao.innerHTML = "👁️ Mostrar lucro";
-    }
-}
-
 async function calcular(){
 
     let nomeObjeto = document.getElementById("nomeObjeto").value.trim();
@@ -443,16 +449,6 @@ async function calcular(){
 
         <p>⚡ Energia: R$ ${custoEnergia.toFixed(2)}</p>
 
-        <button 
-        class="toggle-lucro"
-        onclick="toggleLucro(this)">
-            👁️ Mostrar lucro
-        </button>
-
-        <div class="lucro-box" style="display:none;">
-            <p>📈 Lucro fixo: ${LUCRO_FIXO}%</p>
-        </div>
-
         <hr>
 
         <div class="preco-final">
@@ -461,8 +457,7 @@ async function calcular(){
     `;
 
     let registro = {
-        texto: `${nomeObjeto || "Sem nome"} | ${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`,
-        criadoEm:new Date().toISOString()
+        texto: `${nomeObjeto || "Sem nome"} | ${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`
     };
 
     const transaction = db.transaction(STORE_HISTORICO,"readwrite");
@@ -534,7 +529,7 @@ async function salvarFilamento(){
 
     let nome = document.getElementById("filamentoNome").value;
 
-    let material = document.getElementById("filamentoMaterial").value;
+    let material = document.getElementById("filamentoMaterial").value.toUpperCase();
 
     let peso = document.getElementById("filamentoPeso").value;
 
@@ -555,17 +550,31 @@ async function salvarFilamento(){
         nome,
         material,
         peso,
-        status,
-        criadoEm:new Date().toISOString()
+        status
     });
 
     document.getElementById("filamentoNome").value = "";
-
     document.getElementById("filamentoMaterial").value = "";
-
     document.getElementById("filamentoPeso").value = "";
 
     carregarFilamentos();
+}
+
+async function excluirFilamento(id){
+
+    if(!confirm("Deseja remover este filamento do estoque?")){
+        return;
+    }
+
+    const transaction = db.transaction(STORE_FILAMENTOS,"readwrite");
+
+    const store = transaction.objectStore(STORE_FILAMENTOS);
+
+    store.delete(id);
+
+    transaction.oncomplete = ()=>{
+        carregarFilamentos();
+    };
 }
 
 async function carregarFilamentos(){
@@ -597,6 +606,13 @@ async function carregarFilamentos(){
             
             <div class="filamento-card">
 
+                <button 
+                class="btn-lixeira"
+                onclick="excluirFilamento(${item.id})"
+                title="Excluir filamento">
+                🗑
+                </button>
+
                 <b>${item.nome}</b><br><br>
 
                 🧵 Material: ${item.material}<br>
@@ -610,6 +626,15 @@ async function carregarFilamentos(){
         });
     };
 }
+
+/* MATERIAL AUTOMATICAMENTE MAIÚSCULO */
+document
+.getElementById("filamentoMaterial")
+.addEventListener("input", function(){
+
+    this.value = this.value.toUpperCase();
+
+});
 
 document
 .getElementById("mostrarHistorico")
