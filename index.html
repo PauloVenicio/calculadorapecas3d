@@ -113,22 +113,6 @@ button{
     color:#fff;
 }
 
-.toggle-lucro{
-    background:#1b274d;
-    color:#00f2ff;
-    border:1px solid #00f2ff;
-    margin-top:8px;
-    padding:10px;
-    font-size:14px;
-}
-
-.lucro-box{
-    margin-top:10px;
-    background:rgba(0,242,255,0.08);
-    padding:10px;
-    border-radius:10px;
-}
-
 .historico{
     margin-top:15px;
     background:rgba(0,0,0,0.2);
@@ -218,7 +202,6 @@ button{
     background:#ff4d4d;
     color:#fff;
     transform:scale(1.08);
-    box-shadow:0 0 12px rgba(255,77,77,0.45);
 }
 
 footer{
@@ -241,6 +224,14 @@ hr{
 /* MATERIAL SEMPRE MAIÚSCULO */
 #filamentoMaterial{
     text-transform:uppercase;
+}
+
+.resumo-item{
+    background:#0d1429;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    border:1px solid #1c274d;
 }
 
 </style>
@@ -324,6 +315,8 @@ placeholder="PLA / PETG / ABS"
 </button>
 
 <div class="historico" id="estoqueFilamentos"></div>
+
+<div class="resultado" id="resumoFilamentos"></div>
 
 <hr>
 
@@ -591,16 +584,47 @@ async function carregarFilamentos(){
 
         const div = document.getElementById("estoqueFilamentos");
 
+        const resumo = document.getElementById("resumoFilamentos");
+
         if(itens.length === 0){
 
             div.innerHTML = "";
+
+            resumo.innerHTML = "";
 
             return;
         }
 
         div.innerHTML = "<b>📦 Estoque Atual:</b><br><br>";
 
+        let abertos = 0;
+        let lacrados = 0;
+
+        let materiaisAbertos = {};
+        let materiaisLacrados = {};
+
         itens.reverse().forEach(item=>{
+
+            if(item.status === "Aberto"){
+
+                abertos++;
+
+                if(!materiaisAbertos[item.material]){
+                    materiaisAbertos[item.material] = 0;
+                }
+
+                materiaisAbertos[item.material]++;
+
+            }else{
+
+                lacrados++;
+
+                if(!materiaisLacrados[item.material]){
+                    materiaisLacrados[item.material] = 0;
+                }
+
+                materiaisLacrados[item.material]++;
+            }
 
             div.innerHTML += `
             
@@ -624,6 +648,43 @@ async function carregarFilamentos(){
             </div>
             `;
         });
+
+        let htmlResumo = `
+        
+        <h3 style="color:#00f2ff;text-align:center;">
+            📊 Resumo do Estoque
+        </h3>
+
+        <div class="resumo-item">
+            🔓 <b>Filamentos Abertos:</b> ${abertos}<br><br>
+        `;
+
+        for(let material in materiaisAbertos){
+
+            htmlResumo += `
+                • ${material}: ${materiaisAbertos[material]} aberto(s)<br>
+            `;
+        }
+
+        htmlResumo += `
+        </div>
+
+        <div class="resumo-item">
+            🔒 <b>Filamentos Lacrados:</b> ${lacrados}<br><br>
+        `;
+
+        for(let material in materiaisLacrados){
+
+            htmlResumo += `
+                • ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
+            `;
+        }
+
+        htmlResumo += `
+        </div>
+        `;
+
+        resumo.innerHTML = htmlResumo;
     };
 }
 
