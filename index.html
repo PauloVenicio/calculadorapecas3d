@@ -108,38 +108,6 @@ button{
     color:#000;
 }
 
-.btn-danger{
-    background:#f44336;
-    color:#fff;
-}
-
-.historico{
-    margin-top:15px;
-    background:rgba(0,0,0,0.2);
-    padding:10px;
-    border-radius:12px;
-    max-height:300px;
-    overflow-y:auto;
-}
-
-.historico-toggle{
-    margin-top:12px;
-}
-
-.historico-toggle label{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:0;
-    cursor:pointer;
-}
-
-.historico-toggle input{
-    width:auto;
-    margin:0;
-    padding:0;
-}
-
 .social-links{
     display:flex;
     gap:10px;
@@ -148,6 +116,10 @@ button{
 
 .social-links a{
     flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
     text-align:center;
     text-decoration:none;
     padding:14px;
@@ -155,6 +127,7 @@ button{
     font-weight:bold;
     color:white;
     transition:0.3s;
+    min-height:56px;
 }
 
 .social-links a:hover{
@@ -167,6 +140,11 @@ button{
 
 .whatsapp{
     background:#25D366;
+}
+
+.mercadolivre{
+    background:#ffe600;
+    color:#000 !important;
 }
 
 .filamento-card{
@@ -195,13 +173,36 @@ button{
     cursor:pointer;
     transition:0.25s;
     padding:0;
-    box-shadow:0 0 8px rgba(255,77,77,0.25);
+}
+
+.btn-editar{
+    background:#00bcd4;
+    color:#fff;
+    border:none;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    position:absolute;
+    top:10px;
+    right:52px;
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:0.25s;
+    padding:0;
 }
 
 .btn-lixeira:hover{
     background:#ff4d4d;
     color:#fff;
     transform:scale(1.08);
+}
+
+.btn-editar:hover{
+    transform:scale(1.08);
+    background:#0097a7;
 }
 
 footer{
@@ -221,7 +222,6 @@ hr{
     margin:20px 0;
 }
 
-/* MATERIAL SEMPRE MAIÚSCULO */
 #filamentoMaterial{
     text-transform:uppercase;
 }
@@ -274,32 +274,18 @@ hr{
     Calcular
 </button>
 
-<button class="btn-danger" onclick="limparHistorico()">
-    Limpar Histórico
-</button>
-
-<div class="historico" id="historico"></div>
-
-<div class="historico-toggle">
-    <label for="mostrarHistorico">
-        <input type="checkbox" id="mostrarHistorico">
-        Mostrar histórico
-    </label>
-</div>
-
 <hr>
 
 <h2>📦 Estoque de Filamentos</h2>
 
 <label>Nome do filamento:</label>
-<input type="text" id="filamentoNome" placeholder="Ex.: PLA Preto">
+<input type="text" id="filamentoNome" placeholder="Ex.: Voolt 3D">
 
 <label>Material:</label>
-<input 
-type="text" 
-id="filamentoMaterial" 
-placeholder="PLA / PETG / ABS"
->
+<input type="text" id="filamentoMaterial" placeholder="PLA / PETG / ABS">
+
+<label>Cor do filamento:</label>
+<input type="text" id="filamentoCor" placeholder="Ex.: Preto / Branco / Vermelho">
 
 <label>Peso restante (g):</label>
 <input type="number" id="filamentoPeso">
@@ -322,18 +308,19 @@ placeholder="PLA / PETG / ABS"
 
 <div class="social-links">
 
-    <a 
-    href="https://www.instagram.com/venix3d/"
-    target="_blank"
-    class="instagram">
-        📸 Instagram
+    <a href="https://www.instagram.com/venix3d/" target="_blank" class="instagram">
+        <span>📸</span>
+        <span>Instagram</span>
     </a>
 
-    <a 
-    href="https://chat.whatsapp.com/GvUt2Y9shbt6mIBLmzPBJR"
-    target="_blank"
-    class="whatsapp">
-        💬 WhatsApp
+    <a href="https://chat.whatsapp.com/GvUt2Y9shbt6mIBLmzPBJR" target="_blank" class="whatsapp">
+        <span>💬</span>
+        <span>WhatsApp</span>
+    </a>
+
+    <a href="https://meli.la/2Pj6voY" target="_blank" class="mercadolivre">
+        <span>🛒</span>
+        <span>Mercado Livre</span>
     </a>
 
 </div>
@@ -347,15 +334,11 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 <script>
 
 const DB_NAME = "venix3d_db";
-const DB_VERSION = 2;
+const DB_VERSION = 8;
 
-const STORE_HISTORICO = "historico";
 const STORE_FILAMENTOS = "filamentos";
 
-const LUCRO_FIXO = 120;
-
 let db = null;
-let historico = [];
 
 async function abrirBanco(){
 
@@ -366,14 +349,6 @@ async function abrirBanco(){
         request.onupgradeneeded = (event)=>{
 
             const database = event.target.result;
-
-            if(!database.objectStoreNames.contains(STORE_HISTORICO)){
-
-                database.createObjectStore(STORE_HISTORICO,{
-                    keyPath:"id",
-                    autoIncrement:true
-                });
-            }
 
             if(!database.objectStoreNames.contains(STORE_FILAMENTOS)){
 
@@ -393,8 +368,6 @@ async function abrirBanco(){
 async function inicializar(){
 
     db = await abrirBanco();
-
-    carregarHistorico();
 
     carregarFilamentos();
 }
@@ -430,7 +403,7 @@ async function calcular(){
 
     let custoTotal = custoFilamento + custoMaquina + custoEnergia;
 
-    let precoFinal = custoTotal * (1 + LUCRO_FIXO / 100);
+    let precoFinal = custoTotal * 2.2;
 
     document.getElementById("resultado").innerHTML = `
     
@@ -448,74 +421,6 @@ async function calcular(){
             💰 Preço Final: R$ ${precoFinal.toFixed(2)}
         </div>
     `;
-
-    let registro = {
-        texto: `${nomeObjeto || "Sem nome"} | ${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`
-    };
-
-    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
-
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    store.add(registro);
-
-    carregarHistorico();
-}
-
-async function carregarHistorico(){
-
-    const transaction = db.transaction(STORE_HISTORICO,"readonly");
-
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    const request = store.getAll();
-
-    request.onsuccess = ()=>{
-
-        historico = request.result;
-
-        atualizarHistorico();
-    };
-}
-
-function atualizarHistorico(){
-
-    const mostrar = document.getElementById("mostrarHistorico").checked;
-
-    const div = document.getElementById("historico");
-
-    if(!mostrar || historico.length === 0){
-
-        div.innerHTML = "";
-
-        return;
-    }
-
-    div.innerHTML = "<b>📜 Histórico:</b><br><br>";
-
-    historico.reverse().forEach(item=>{
-
-        div.innerHTML += `
-            • ${item.texto}<br><br>
-        `;
-    });
-}
-
-async function limparHistorico(){
-
-    if(!confirm("Deseja apagar o histórico?")) return;
-
-    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
-
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    store.clear();
-
-    historico = [];
-
-    atualizarHistorico();
-
-    document.getElementById("resultado").innerHTML = "";
 }
 
 async function salvarFilamento(){
@@ -524,11 +429,13 @@ async function salvarFilamento(){
 
     let material = document.getElementById("filamentoMaterial").value.toUpperCase();
 
+    let cor = document.getElementById("filamentoCor").value;
+
     let peso = document.getElementById("filamentoPeso").value;
 
     let status = document.getElementById("filamentoStatus").value;
 
-    if(!nome || !material || !peso){
+    if(!nome || !material || !cor || !peso){
 
         alert("Preencha todos os dados.");
 
@@ -542,12 +449,14 @@ async function salvarFilamento(){
     store.add({
         nome,
         material,
+        cor,
         peso,
         status
     });
 
     document.getElementById("filamentoNome").value = "";
     document.getElementById("filamentoMaterial").value = "";
+    document.getElementById("filamentoCor").value = "";
     document.getElementById("filamentoPeso").value = "";
 
     carregarFilamentos();
@@ -567,6 +476,45 @@ async function excluirFilamento(id){
 
     transaction.oncomplete = ()=>{
         carregarFilamentos();
+    };
+}
+
+async function editarFilamento(id){
+
+    const transaction = db.transaction(STORE_FILAMENTOS,"readonly");
+
+    const store = transaction.objectStore(STORE_FILAMENTOS);
+
+    const request = store.get(id);
+
+    request.onsuccess = ()=>{
+
+        const item = request.result;
+
+        if(!item) return;
+
+        document.getElementById("filamentoNome").value = item.nome;
+
+        document.getElementById("filamentoMaterial").value = item.material;
+
+        document.getElementById("filamentoCor").value = item.cor;
+
+        document.getElementById("filamentoPeso").value = item.peso;
+
+        document.getElementById("filamentoStatus").value = item.status;
+
+        const deleteTransaction = db.transaction(STORE_FILAMENTOS,"readwrite");
+
+        const deleteStore = deleteTransaction.objectStore(STORE_FILAMENTOS);
+
+        deleteStore.delete(id);
+
+        deleteTransaction.oncomplete = ()=>{
+
+            carregarFilamentos();
+
+        };
+
     };
 }
 
@@ -605,30 +553,39 @@ async function carregarFilamentos(){
 
         itens.reverse().forEach(item=>{
 
+            const chave = `${item.material} - ${item.cor}`;
+
             if(item.status === "Aberto"){
 
                 abertos++;
 
-                if(!materiaisAbertos[item.material]){
-                    materiaisAbertos[item.material] = 0;
+                if(!materiaisAbertos[chave]){
+                    materiaisAbertos[chave] = 0;
                 }
 
-                materiaisAbertos[item.material]++;
+                materiaisAbertos[chave]++;
 
             }else{
 
                 lacrados++;
 
-                if(!materiaisLacrados[item.material]){
-                    materiaisLacrados[item.material] = 0;
+                if(!materiaisLacrados[chave]){
+                    materiaisLacrados[chave] = 0;
                 }
 
-                materiaisLacrados[item.material]++;
+                materiaisLacrados[chave]++;
             }
 
             div.innerHTML += `
             
             <div class="filamento-card">
+
+                <button 
+                class="btn-editar"
+                onclick="editarFilamento(${item.id})"
+                title="Editar filamento">
+                ✏️
+                </button>
 
                 <button 
                 class="btn-lixeira"
@@ -640,6 +597,8 @@ async function carregarFilamentos(){
                 <b>${item.nome}</b><br><br>
 
                 🧵 Material: ${item.material}<br>
+
+                🎨 Cor: ${item.cor}<br>
 
                 ⚖️ Peso: ${item.peso}g<br>
 
@@ -659,10 +618,10 @@ async function carregarFilamentos(){
             🔓 <b>Filamentos Abertos:</b> ${abertos}<br><br>
         `;
 
-        for(let material in materiaisAbertos){
+        for(let item in materiaisAbertos){
 
             htmlResumo += `
-                • ${material}: ${materiaisAbertos[material]} aberto(s)<br>
+                • ${item}: ${materiaisAbertos[item]} aberto(s)<br>
             `;
         }
 
@@ -673,10 +632,10 @@ async function carregarFilamentos(){
             🔒 <b>Filamentos Lacrados:</b> ${lacrados}<br><br>
         `;
 
-        for(let material in materiaisLacrados){
+        for(let item in materiaisLacrados){
 
             htmlResumo += `
-                • ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
+                • ${item}: ${materiaisLacrados[item]} lacrado(s)<br>
             `;
         }
 
@@ -688,7 +647,6 @@ async function carregarFilamentos(){
     };
 }
 
-/* MATERIAL AUTOMATICAMENTE MAIÚSCULO */
 document
 .getElementById("filamentoMaterial")
 .addEventListener("input", function(){
@@ -696,10 +654,6 @@ document
     this.value = this.value.toUpperCase();
 
 });
-
-document
-.getElementById("mostrarHistorico")
-.addEventListener("change", atualizarHistorico);
 
 inicializar();
 
