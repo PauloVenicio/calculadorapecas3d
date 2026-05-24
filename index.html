@@ -17,15 +17,27 @@
     --card:#111933;
     --text:#ffffff;
     --primary:#00f2ff;
+    --footer-height:56px;
+}
+
+html{
+    width:100%;
+    min-height:100%;
+    overflow-x:hidden;
 }
 
 body{
+    width:100%;
+    min-height:100%;
     margin:0;
     font-family:Arial,sans-serif;
     background:var(--bg);
     color:var(--text);
     padding:14px;
-    padding-bottom:120px;
+    padding-left:max(14px,env(safe-area-inset-left));
+    padding-right:max(14px,env(safe-area-inset-right));
+    padding-bottom:calc(var(--footer-height) + 36px + env(safe-area-inset-bottom));
+    overflow-x:hidden;
 }
 
 .card{
@@ -35,7 +47,7 @@ body{
     border-radius:16px;
     max-width:520px;
     margin:0 auto;
-    box-shadow:0 0 20px var(--primary);
+    box-shadow:0 0 20px rgba(0,242,255,0.7);
 }
 
 .logo-area{
@@ -44,13 +56,17 @@ body{
 }
 
 .logo-area img{
-    max-width:180px;
+    width:min(180px,80%);
     max-height:120px;
+    object-fit:contain;
 }
 
 h2{
     text-align:center;
     color:var(--primary);
+    font-size:clamp(1.25rem,6vw,1.55rem);
+    line-height:1.25;
+    overflow-wrap:anywhere;
 }
 
 label{
@@ -61,17 +77,25 @@ label{
 input,
 select{
     width:100%;
+    min-height:46px;
     padding:12px;
     font-size:16px;
     border-radius:10px;
     border:1px solid #555;
     margin-top:5px;
-    background:transparent;
+    background:#0d1429;
     color:var(--text);
+}
+
+input:focus,
+select:focus{
+    outline:2px solid var(--primary);
+    outline-offset:2px;
 }
 
 select option{
     background:#111933;
+    color:#fff;
 }
 
 .resultado{
@@ -79,6 +103,7 @@ select option{
     background:rgba(0,0,0,0.2);
     padding:12px;
     border-radius:12px;
+    overflow-wrap:anywhere;
 }
 
 .resultado:empty,
@@ -90,10 +115,12 @@ select option{
     color:#00ff88;
     font-size:1.4em;
     text-align:center;
+    line-height:1.3;
 }
 
 button{
     width:100%;
+    min-height:46px;
     padding:13px;
     font-size:16px;
     margin-top:10px;
@@ -101,6 +128,7 @@ button{
     border:none;
     font-weight:bold;
     cursor:pointer;
+    touch-action:manipulation;
 }
 
 .btn-primary{
@@ -120,6 +148,8 @@ button{
     border-radius:12px;
     max-height:300px;
     overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overflow-wrap:anywhere;
 }
 
 .historico-toggle{
@@ -136,6 +166,7 @@ button{
 
 .historico-toggle input{
     width:auto;
+    min-height:auto;
     margin:0;
     padding:0;
 }
@@ -155,10 +186,13 @@ button{
     font-weight:bold;
     color:white;
     transition:0.3s;
+    min-height:46px;
 }
 
-.social-links a:hover{
-    transform:scale(1.03);
+@media (hover:hover){
+    .social-links a:hover{
+        transform:scale(1.03);
+    }
 }
 
 .instagram{
@@ -171,7 +205,7 @@ button{
 
 .filamento-card{
     background:#0d1429;
-    padding:14px;
+    padding:14px 56px 14px 14px;
     border-radius:12px;
     margin-bottom:10px;
     border:1px solid #1c274d;
@@ -182,8 +216,8 @@ button{
     background:#1c274d;
     color:#ff4d4d;
     border:1px solid #ff4d4d;
-    width:34px;
-    height:34px;
+    width:38px;
+    height:38px;
     border-radius:10px;
     position:absolute;
     top:10px;
@@ -198,10 +232,12 @@ button{
     box-shadow:0 0 8px rgba(255,77,77,0.25);
 }
 
-.btn-lixeira:hover{
-    background:#ff4d4d;
-    color:#fff;
-    transform:scale(1.08);
+@media (hover:hover){
+    .btn-lixeira:hover{
+        background:#ff4d4d;
+        color:#fff;
+        transform:scale(1.08);
+    }
 }
 
 footer{
@@ -209,21 +245,19 @@ footer{
     bottom:0;
     left:0;
     width:100%;
+    min-height:var(--footer-height);
     background:#000;
     color:var(--primary);
     text-align:center;
-    padding:10px;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
     font-size:14px;
+    line-height:1.3;
+    z-index:10;
 }
 
 hr{
     border-color:#333;
     margin:20px 0;
-}
-
-/* MATERIAL SEMPRE MAIÚSCULO */
-#filamentoMaterial{
-    text-transform:uppercase;
 }
 
 .resumo-item{
@@ -234,6 +268,22 @@ hr{
     border:1px solid #1c274d;
 }
 
+@media (max-width:420px){
+    body{
+        padding-top:10px;
+    }
+
+    .card{
+        padding:14px;
+        border-radius:12px;
+        box-shadow:0 0 14px rgba(0,242,255,0.55);
+    }
+
+    .social-links{
+        flex-direction:column;
+    }
+}
+
 </style>
 </head>
 
@@ -242,39 +292,39 @@ hr{
 <div class="card">
 
 <div class="logo-area">
-    <img src="logo horizontal.jpg">
+    <img src="logo horizontal.jpg" alt="Venix3D">
 </div>
 
-<h2>🖨️ Venix3D - Sistema 3D 💰</h2>
+<h2>Venix3D - Sistema 3D</h2>
 
-<label>Nome do objeto:</label>
-<input type="text" id="nomeObjeto" placeholder="Ex.: Suporte de celular">
+<label for="nomeObjeto">Nome do objeto:</label>
+<input type="text" id="nomeObjeto" placeholder="Ex.: Suporte de celular" autocomplete="off">
 
-<label>Peso (g):</label>
-<input type="number" id="peso" step="0.01">
+<label for="peso">Peso (g):</label>
+<input type="text" id="peso" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
-<label>Tempo (horas):</label>
-<input type="number" id="tempo" step="0.1">
+<label for="tempo">Tempo (horas):</label>
+<input type="text" id="tempo" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
-<label>Preço do filamento (R$/kg):</label>
-<input type="number" id="precoKg" value="130">
+<label for="precoKg">Preço do filamento (R$/kg):</label>
+<input type="text" id="precoKg" value="130" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
-<label>Custo da máquina (R$/hora):</label>
-<input type="number" id="custoHora" value="4">
+<label for="custoHora">Custo da máquina (R$/hora):</label>
+<input type="text" id="custoHora" value="4" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
-<label>Energia (R$/kWh):</label>
-<input type="number" id="energia" value="1.37">
+<label for="energia">Energia (R$/kWh):</label>
+<input type="text" id="energia" value="1.37" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
-<label>Consumo (kW):</label>
-<input type="number" id="consumo" value="0.19">
+<label for="consumo">Consumo (kW):</label>
+<input type="text" id="consumo" value="0.19" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
 
 <div class="resultado" id="resultado"></div>
 
-<button class="btn-primary" onclick="calcular()">
+<button class="btn-primary" type="button" onclick="calcular()">
     Calcular
 </button>
 
-<button class="btn-danger" onclick="limparHistorico()">
+<button class="btn-danger" type="button" onclick="limparHistorico()">
     Limpar Histórico
 </button>
 
@@ -289,28 +339,54 @@ hr{
 
 <hr>
 
-<h2>📦 Estoque de Filamentos</h2>
+<h2>Estoque de Filamentos</h2>
 
-<label>Nome do filamento:</label>
-<input type="text" id="filamentoNome" placeholder="Ex.: PLA Preto">
+<label for="filamentoNome">Marca do filamento:</label>
+<select id="filamentoNome">
+    <option value="">Selecione uma marca</option>
+    <option value="Voolt 3D">Voolt 3D</option>
+    <option value="Masterprint">Masterprint</option>
+    <option value="3DFila">3DFila</option>
+    <option value="Creality">Creality</option>
+    <option value="Elegoo">Elegoo</option>
+    <option value="Bambu Lab">Bambu Lab</option>
+    <option value="eSUN">eSUN</option>
+</select>
 
-<label>Material:</label>
-<input 
-type="text" 
-id="filamentoMaterial" 
-placeholder="PLA / PETG / ABS"
->
+<label for="filamentoMaterial">Material:</label>
+<select id="filamentoMaterial">
+    <option value="">Selecione o material</option>
+    <option value="PLA">PLA</option>
+    <option value="PETG">PETG</option>
+    <option value="ABS">ABS</option>
+    <option value="TPU">TPU</option>
+</select>
 
-<label>Peso restante (g):</label>
-<input type="number" id="filamentoPeso">
+<label for="filamentoCor">Cor:</label>
+<select id="filamentoCor">
+    <option value="">Selecione a cor</option>
+    <option value="Branco">Branco</option>
+    <option value="Preto">Preto</option>
+    <option value="Cinza">Cinza</option>
+    <option value="Rosa">Rosa</option>
+    <option value="Laranja">Laranja</option>
+    <option value="Roxo">Roxo</option>
+    <option value="Azul">Azul</option>
+    <option value="Amarelo">Amarelo</option>
+    <option value="Verde">Verde</option>
+    <option value="Vermelho">Vermelho</option>
+</select>
 
-<label>Status:</label>
+<label for="filamentoPeso">Peso restante (g):</label>
+<input type="text" id="filamentoPeso" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*">
+
+<label for="filamentoStatus">Status:</label>
 <select id="filamentoStatus">
     <option value="Lacrado">Lacrado</option>
     <option value="Aberto">Aberto</option>
 </select>
 
-<button class="btn-primary" onclick="salvarFilamento()">
+<button class="btn-primary" type="button" onclick="salvarFilamento()">
     Salvar Filamento
 </button>
 
@@ -322,18 +398,20 @@ placeholder="PLA / PETG / ABS"
 
 <div class="social-links">
 
-    <a 
+    <a
     href="https://www.instagram.com/venix3d/"
     target="_blank"
+    rel="noopener"
     class="instagram">
-        📸 Instagram
+        Instagram
     </a>
 
-    <a 
+    <a
     href="https://chat.whatsapp.com/GvUt2Y9shbt6mIBLmzPBJR"
     target="_blank"
+    rel="noopener"
     class="whatsapp">
-        💬 WhatsApp
+        WhatsApp
     </a>
 
 </div>
@@ -357,9 +435,54 @@ const LUCRO_FIXO = 120;
 let db = null;
 let historico = [];
 
+function lerNumero(id){
+
+    const valor = document.getElementById(id).value.trim().replace(",",".");
+
+    return parseFloat(valor);
+}
+
+function formatarPeso(valor){
+
+    return String(valor).replace(".",",");
+}
+
+function executarTransacao(storeName, mode, callback){
+
+    return new Promise((resolve,reject)=>{
+
+        const transaction = db.transaction(storeName,mode);
+        const store = transaction.objectStore(storeName);
+
+        callback(store);
+
+        transaction.oncomplete = ()=>resolve();
+        transaction.onerror = ()=>reject(transaction.error);
+        transaction.onabort = ()=>reject(transaction.error);
+    });
+}
+
+function buscarTodos(storeName){
+
+    return new Promise((resolve,reject)=>{
+
+        const transaction = db.transaction(storeName,"readonly");
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+
+        request.onsuccess = ()=>resolve(request.result);
+        request.onerror = ()=>reject(request.error);
+    });
+}
+
 async function abrirBanco(){
 
     return new Promise((resolve,reject)=>{
+
+        if(!window.indexedDB){
+            reject(new Error("Este navegador não permite salvar dados locais."));
+            return;
+        }
 
         const request = indexedDB.open(DB_NAME,DB_VERSION);
 
@@ -392,28 +515,37 @@ async function abrirBanco(){
 
 async function inicializar(){
 
-    db = await abrirBanco();
+    try{
+        db = await abrirBanco();
 
-    carregarHistorico();
-
-    carregarFilamentos();
+        await carregarHistorico();
+        await carregarFilamentos();
+    }catch(error){
+        alert("Não foi possível iniciar o armazenamento local. Abra a página em um navegador atualizado e fora do modo privado.");
+        console.error(error);
+    }
 }
 
 async function calcular(){
 
+    if(!db){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
+
     let nomeObjeto = document.getElementById("nomeObjeto").value.trim();
 
-    let peso = parseFloat(document.getElementById("peso").value);
+    let peso = lerNumero("peso");
 
-    let tempo = parseFloat(document.getElementById("tempo").value);
+    let tempo = lerNumero("tempo");
 
-    let precoKg = parseFloat(document.getElementById("precoKg").value);
+    let precoKg = lerNumero("precoKg");
 
-    let custoHora = parseFloat(document.getElementById("custoHora").value);
+    let custoHora = lerNumero("custoHora");
 
-    let energia = parseFloat(document.getElementById("energia").value);
+    let energia = lerNumero("energia");
 
-    let consumo = parseFloat(document.getElementById("consumo").value);
+    let consumo = lerNumero("consumo");
 
     if(isNaN(peso) || isNaN(tempo)){
 
@@ -421,6 +553,11 @@ async function calcular(){
 
         return;
     }
+
+    precoKg = isNaN(precoKg) ? 0 : precoKg;
+    custoHora = isNaN(custoHora) ? 0 : custoHora;
+    energia = isNaN(energia) ? 0 : energia;
+    consumo = isNaN(consumo) ? 0 : consumo;
 
     let custoFilamento = (precoKg / 1000) * peso;
 
@@ -433,19 +570,19 @@ async function calcular(){
     let precoFinal = custoTotal * (1 + LUCRO_FIXO / 100);
 
     document.getElementById("resultado").innerHTML = `
-    
-        <p><strong>📦 Produto:</strong> ${nomeObjeto || "Sem nome"}</p>
 
-        <p>🧵 Filamento: R$ ${custoFilamento.toFixed(2)}</p>
+        <p><strong>Produto:</strong> ${nomeObjeto || "Sem nome"}</p>
 
-        <p>🖨️ Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+        <p>Filamento: R$ ${custoFilamento.toFixed(2)}</p>
 
-        <p>⚡ Energia: R$ ${custoEnergia.toFixed(2)}</p>
+        <p>Máquina: R$ ${custoMaquina.toFixed(2)}</p>
+
+        <p>Energia: R$ ${custoEnergia.toFixed(2)}</p>
 
         <hr>
 
         <div class="preco-final">
-            💰 Preço Final: R$ ${precoFinal.toFixed(2)}
+            Preço Final: R$ ${precoFinal.toFixed(2)}
         </div>
     `;
 
@@ -453,29 +590,18 @@ async function calcular(){
         texto: `${nomeObjeto || "Sem nome"} | ${peso}g | ${tempo}h | R$ ${precoFinal.toFixed(2)}`
     };
 
-    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
+    await executarTransacao(STORE_HISTORICO,"readwrite",(store)=>{
+        store.add(registro);
+    });
 
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    store.add(registro);
-
-    carregarHistorico();
+    await carregarHistorico();
 }
 
 async function carregarHistorico(){
 
-    const transaction = db.transaction(STORE_HISTORICO,"readonly");
+    historico = await buscarTodos(STORE_HISTORICO);
 
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    const request = store.getAll();
-
-    request.onsuccess = ()=>{
-
-        historico = request.result;
-
-        atualizarHistorico();
-    };
+    atualizarHistorico();
 }
 
 function atualizarHistorico(){
@@ -491,9 +617,9 @@ function atualizarHistorico(){
         return;
     }
 
-    div.innerHTML = "<b>📜 Histórico:</b><br><br>";
+    div.innerHTML = "<b>Histórico:</b><br><br>";
 
-    historico.reverse().forEach(item=>{
+    [...historico].reverse().forEach(item=>{
 
         div.innerHTML += `
             • ${item.texto}<br><br>
@@ -503,13 +629,16 @@ function atualizarHistorico(){
 
 async function limparHistorico(){
 
+    if(!db){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
+
     if(!confirm("Deseja apagar o histórico?")) return;
 
-    const transaction = db.transaction(STORE_HISTORICO,"readwrite");
-
-    const store = transaction.objectStore(STORE_HISTORICO);
-
-    store.clear();
+    await executarTransacao(STORE_HISTORICO,"readwrite",(store)=>{
+        store.clear();
+    });
 
     historico = [];
 
@@ -520,182 +649,228 @@ async function limparHistorico(){
 
 async function salvarFilamento(){
 
-    let nome = document.getElementById("filamentoNome").value;
+    if(!db){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
 
-    let material = document.getElementById("filamentoMaterial").value.toUpperCase();
+    let nome = document.getElementById("filamentoNome").value.trim();
 
-    let peso = document.getElementById("filamentoPeso").value;
+    let material = document.getElementById("filamentoMaterial").value.trim().toUpperCase();
+
+    let cor = document.getElementById("filamentoCor").value;
+
+    let peso = document.getElementById("filamentoPeso").value.trim().replace(",",".");
 
     let status = document.getElementById("filamentoStatus").value;
 
-    if(!nome || !material || !peso){
+    if(!nome || !material || !cor || !peso){
 
         alert("Preencha todos os dados.");
 
         return;
     }
 
-    const transaction = db.transaction(STORE_FILAMENTOS,"readwrite");
-
-    const store = transaction.objectStore(STORE_FILAMENTOS);
-
-    store.add({
-        nome,
-        material,
-        peso,
-        status
+    await executarTransacao(STORE_FILAMENTOS,"readwrite",(store)=>{
+        store.add({
+            nome,
+            material,
+            cor,
+            peso,
+            status
+        });
     });
 
-    document.getElementById("filamentoNome").value = "";
-    document.getElementById("filamentoMaterial").value = "";
+    document.getElementById("filamentoNome").selectedIndex = 0;
+    document.getElementById("filamentoMaterial").selectedIndex = 0;
+    document.getElementById("filamentoCor").selectedIndex = 0;
     document.getElementById("filamentoPeso").value = "";
 
-    carregarFilamentos();
+    await carregarFilamentos();
 }
 
 async function excluirFilamento(id){
+
+    if(!db){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
 
     if(!confirm("Deseja remover este filamento do estoque?")){
         return;
     }
 
-    const transaction = db.transaction(STORE_FILAMENTOS,"readwrite");
+    await executarTransacao(STORE_FILAMENTOS,"readwrite",(store)=>{
+        store.delete(id);
+    });
 
-    const store = transaction.objectStore(STORE_FILAMENTOS);
-
-    store.delete(id);
-
-    transaction.oncomplete = ()=>{
-        carregarFilamentos();
-    };
+    await carregarFilamentos();
 }
 
 async function carregarFilamentos(){
 
-    const transaction = db.transaction(STORE_FILAMENTOS,"readonly");
+    const itens = await buscarTodos(STORE_FILAMENTOS);
 
-    const store = transaction.objectStore(STORE_FILAMENTOS);
+    const div = document.getElementById("estoqueFilamentos");
 
-    const request = store.getAll();
+    const resumo = document.getElementById("resumoFilamentos");
 
-    request.onsuccess = ()=>{
+    if(itens.length === 0){
 
-        const itens = request.result;
+        div.innerHTML = "";
 
-        const div = document.getElementById("estoqueFilamentos");
+        resumo.innerHTML = "";
 
-        const resumo = document.getElementById("resumoFilamentos");
+        return;
+    }
 
-        if(itens.length === 0){
+    div.innerHTML = "<b>Estoque Atual:</b><br><br>";
 
-            div.innerHTML = "";
+    let abertos = 0;
+    let lacrados = 0;
 
-            resumo.innerHTML = "";
+    let materiaisAbertos = {};
+    let materiaisLacrados = {};
+    let coresAbertas = {};
+    let coresLacradas = {};
 
-            return;
-        }
+    [...itens].reverse().forEach(item=>{
 
-        div.innerHTML = "<b>📦 Estoque Atual:</b><br><br>";
+        if(item.status === "Aberto"){
 
-        let abertos = 0;
-        let lacrados = 0;
+            abertos++;
 
-        let materiaisAbertos = {};
-        let materiaisLacrados = {};
-
-        itens.reverse().forEach(item=>{
-
-            if(item.status === "Aberto"){
-
-                abertos++;
-
-                if(!materiaisAbertos[item.material]){
-                    materiaisAbertos[item.material] = 0;
-                }
-
-                materiaisAbertos[item.material]++;
-
-            }else{
-
-                lacrados++;
-
-                if(!materiaisLacrados[item.material]){
-                    materiaisLacrados[item.material] = 0;
-                }
-
-                materiaisLacrados[item.material]++;
+            if(!materiaisAbertos[item.material]){
+                materiaisAbertos[item.material] = 0;
             }
 
-            div.innerHTML += `
-            
-            <div class="filamento-card">
+            materiaisAbertos[item.material]++;
 
-                <button 
-                class="btn-lixeira"
-                onclick="excluirFilamento(${item.id})"
-                title="Excluir filamento">
-                🗑
-                </button>
+            if(item.cor){
 
-                <b>${item.nome}</b><br><br>
+                if(!coresAbertas[item.cor]){
+                    coresAbertas[item.cor] = 0;
+                }
 
-                🧵 Material: ${item.material}<br>
+                coresAbertas[item.cor]++;
+            }
 
-                ⚖️ Peso: ${item.peso}g<br>
+        }else{
 
-                📌 Status: ${item.status}
+            lacrados++;
 
-            </div>
-            `;
-        });
+            if(!materiaisLacrados[item.material]){
+                materiaisLacrados[item.material] = 0;
+            }
 
-        let htmlResumo = `
-        
-        <h3 style="color:#00f2ff;text-align:center;">
-            📊 Resumo do Estoque
-        </h3>
+            materiaisLacrados[item.material]++;
 
-        <div class="resumo-item">
-            🔓 <b>Filamentos Abertos:</b> ${abertos}<br><br>
-        `;
+            if(item.cor){
 
-        for(let material in materiaisAbertos){
+                if(!coresLacradas[item.cor]){
+                    coresLacradas[item.cor] = 0;
+                }
 
-            htmlResumo += `
-                • ${material}: ${materiaisAbertos[material]} aberto(s)<br>
-            `;
+                coresLacradas[item.cor]++;
+            }
         }
 
-        htmlResumo += `
+        div.innerHTML += `
+
+        <div class="filamento-card">
+
+            <button
+            class="btn-lixeira"
+            type="button"
+            onclick="excluirFilamento(${item.id})"
+            title="Excluir filamento"
+            aria-label="Excluir filamento">
+            X
+            </button>
+
+            <b>${item.nome}</b><br><br>
+
+            Material: ${item.material}<br>
+
+            Cor: ${item.cor || "Não informada"}<br>
+
+            Peso: ${formatarPeso(item.peso)}g<br>
+
+            Status: ${item.status}
+
         </div>
-
-        <div class="resumo-item">
-            🔒 <b>Filamentos Lacrados:</b> ${lacrados}<br><br>
         `;
+    });
 
-        for(let material in materiaisLacrados){
+    let htmlResumo = `
+
+    <h3 style="color:#00f2ff;text-align:center;">
+        Resumo do Estoque
+    </h3>
+
+    <div class="resumo-item">
+        <b>Filamentos Abertos:</b> ${abertos}<br><br>
+    `;
+
+    for(let material in materiaisAbertos){
+
+        htmlResumo += `
+            • ${material}: ${materiaisAbertos[material]} aberto(s)<br>
+        `;
+    }
+
+    htmlResumo += `<br><b>Cores abertas:</b><br>`;
+
+    if(Object.keys(coresAbertas).length === 0){
+
+        htmlResumo += `Nenhuma cor aberta cadastrada<br>`;
+
+    }else{
+
+        for(let cor in coresAbertas){
 
             htmlResumo += `
-                • ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
+                • ${cor}: ${coresAbertas[cor]} aberto(s)<br>
             `;
         }
+    }
+
+    htmlResumo += `
+    </div>
+
+    <div class="resumo-item">
+        <b>Filamentos Lacrados:</b> ${lacrados}<br><br>
+    `;
+
+    for(let material in materiaisLacrados){
 
         htmlResumo += `
-        </div>
+            • ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
         `;
+    }
 
-        resumo.innerHTML = htmlResumo;
-    };
+    htmlResumo += `<br><b>Cores lacradas:</b><br>`;
+
+    if(Object.keys(coresLacradas).length === 0){
+
+        htmlResumo += `Nenhuma cor lacrada cadastrada<br>`;
+
+    }else{
+
+        for(let cor in coresLacradas){
+
+            htmlResumo += `
+                • ${cor}: ${coresLacradas[cor]} lacrado(s)<br>
+            `;
+        }
+    }
+
+    htmlResumo += `
+    </div>
+    `;
+
+    resumo.innerHTML = htmlResumo;
 }
-
-/* MATERIAL AUTOMATICAMENTE MAIÚSCULO */
-document
-.getElementById("filamentoMaterial")
-.addEventListener("input", function(){
-
-    this.value = this.value.toUpperCase();
-
-});
 
 document
 .getElementById("mostrarHistorico")
