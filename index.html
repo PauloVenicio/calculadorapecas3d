@@ -75,7 +75,8 @@ label{
 }
 
 input,
-select{
+select,
+textarea{
     width:100%;
     min-height:46px;
     padding:12px;
@@ -88,9 +89,15 @@ select{
 }
 
 input:focus,
-select:focus{
+select:focus,
+textarea:focus{
     outline:2px solid var(--primary);
     outline-offset:2px;
+}
+
+textarea{
+    min-height:92px;
+    resize:vertical;
 }
 
 select option{
@@ -139,6 +146,11 @@ button{
 .btn-danger{
     background:#f44336;
     color:#fff;
+}
+
+.btn-success{
+    background:#22c55e;
+    color:#06140b;
 }
 
 .historico{
@@ -215,6 +227,36 @@ button{
     margin-bottom:10px;
     border:1px solid #1c274d;
     position:relative;
+}
+
+.encomenda-card.concluida{
+    opacity:0.72;
+}
+
+.encomenda-status{
+    display:inline-block;
+    margin-top:8px;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#1c274d;
+    color:#fff;
+    font-size:13px;
+}
+
+.encomenda-card.concluida .encomenda-status{
+    background:#22c55e;
+    color:#06140b;
+}
+
+.encomenda-actions{
+    display:flex;
+    gap:8px;
+    margin-top:12px;
+}
+
+.encomenda-actions button{
+    flex:1;
+    margin-top:0;
 }
 
 .btn-lixeira{
@@ -401,6 +443,25 @@ hr{
 
 <hr>
 
+<h2>Encomendas</h2>
+
+<label for="encomendaCliente">Cliente:</label>
+<input type="text" id="encomendaCliente" placeholder="Nome do cliente" autocomplete="off">
+
+<label for="encomendaObjeto">Objeto:</label>
+<input type="text" id="encomendaObjeto" placeholder="Ex.: Chaveiro personalizado" autocomplete="off">
+
+<label for="encomendaObs">Observação:</label>
+<textarea id="encomendaObs" placeholder="Prazo, cor, quantidade, medidas ou detalhes da peça"></textarea>
+
+<button class="btn-primary" type="button" onclick="salvarEncomenda()">
+    Salvar Encomenda
+</button>
+
+<div class="historico" id="listaEncomendas"></div>
+
+<hr>
+
 <div class="social-links">
 
     <a
@@ -438,13 +499,15 @@ Paulo Carvalho 2026 - Todos os direitos reservados.
 <script>
 
 const DB_NAME = "venix3d_db";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 const STORE_HISTORICO = "historico";
 const STORE_FILAMENTOS = "filamentos";
+const STORE_ENCOMENDAS = "encomendas";
 const LS_KEYS = {
     [STORE_HISTORICO]:"venix3d_historico",
-    [STORE_FILAMENTOS]:"venix3d_filamentos"
+    [STORE_FILAMENTOS]:"venix3d_filamentos",
+    [STORE_ENCOMENDAS]:"venix3d_encomendas"
 };
 
 const LUCRO_FIXO = 120;
@@ -463,6 +526,16 @@ function lerNumero(id){
 function formatarPeso(valor){
 
     return String(valor).replace(".",",");
+}
+
+function escaparHtml(texto){
+
+    return String(texto || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 function armazenamentoPronto(){
@@ -515,6 +588,18 @@ function executarTransacao(storeName, mode, callback){
 
                         if(index >= 0){
                             itens.splice(index,1);
+                        }
+                    },
+                    put(item){
+                        const index = itens.findIndex(registro=>Number(registro.id) === Number(item.id));
+
+                        if(index >= 0){
+                            itens[index] = item;
+                        }else{
+                            itens.push({
+                                ...item,
+                                id:item.id || proximoId(itens)
+                            });
                         }
                     }
                 };
@@ -597,6 +682,14 @@ async function abrirBanco(){
                     autoIncrement:true
                 });
             }
+
+            if(!database.objectStoreNames.contains(STORE_ENCOMENDAS)){
+
+                database.createObjectStore(STORE_ENCOMENDAS,{
+                    keyPath:"id",
+                    autoIncrement:true
+                });
+            }
         };
 
         request.onsuccess = ()=>resolve(request.result);
@@ -621,6 +714,7 @@ async function inicializar(){
     try{
         await carregarHistorico();
         await carregarFilamentos();
+        await carregarEncomendas();
     }catch(error){
         alert("Nao foi possivel carregar os dados salvos neste navegador.");
         console.error(error);
@@ -971,6 +1065,126 @@ async function carregarFilamentos(){
     `;
 
     resumo.innerHTML = htmlResumo;
+}
+
+async function salvarEncomenda(){
+
+    if(!armazenamentoPronto()){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
+
+    const cliente = document.getElementById("encomendaCliente").value.trim();
+    const objeto = document.getElementById("encomendaObjeto").value.trim();
+    const observacao = document.getElementById("encomendaObs").value.trim();
+
+    if(!cliente || !objeto){
+        alert("Preencha cliente e objeto da encomenda.");
+        return;
+    }
+
+    await executarTransacao(STORE_ENCOMENDAS,"readwrite",(store)=>{
+        store.add({
+            cliente,
+            objeto,
+            observacao,
+            concluida:false,
+            criadaEm:new Date().toISOString()
+        });
+    });
+
+    document.getElementById("encomendaCliente").value = "";
+    document.getElementById("encomendaObjeto").value = "";
+    document.getElementById("encomendaObs").value = "";
+
+    await carregarEncomendas();
+}
+
+async function carregarEncomendas(){
+
+    const encomendas = await buscarTodos(STORE_ENCOMENDAS);
+    const div = document.getElementById("listaEncomendas");
+
+    if(encomendas.length === 0){
+        div.innerHTML = "";
+        return;
+    }
+
+    div.innerHTML = "<b>Encomendas Salvas:</b><br><br>";
+
+    [...encomendas].reverse().forEach(item=>{
+
+        const data = item.criadaEm
+        ? new Date(item.criadaEm).toLocaleDateString("pt-BR")
+        : "Sem data";
+
+        const statusTexto = item.concluida ? "Concluída" : "Pendente";
+        const acaoTexto = item.concluida ? "Reabrir" : "Concluir";
+
+        div.innerHTML += `
+        <div class="filamento-card encomenda-card ${item.concluida ? "concluida" : ""}">
+            <b>${escaparHtml(item.objeto)}</b><br><br>
+            Cliente: ${escaparHtml(item.cliente)}<br>
+            Data: ${data}<br>
+            ${item.observacao ? `Observação: ${escaparHtml(item.observacao)}<br>` : ""}
+            <span class="encomenda-status">${statusTexto}</span>
+
+            <div class="encomenda-actions">
+                <button
+                class="btn-success"
+                type="button"
+                onclick="alternarEncomenda(${item.id})">
+                    ${acaoTexto}
+                </button>
+
+                <button
+                class="btn-danger"
+                type="button"
+                onclick="excluirEncomenda(${item.id})">
+                    Excluir
+                </button>
+            </div>
+        </div>
+        `;
+    });
+}
+
+async function alternarEncomenda(id){
+
+    if(!armazenamentoPronto()){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
+
+    const encomendas = await buscarTodos(STORE_ENCOMENDAS);
+    const encomenda = encomendas.find(item=>Number(item.id) === Number(id));
+
+    if(!encomenda) return;
+
+    encomenda.concluida = !encomenda.concluida;
+    encomenda.concluidaEm = encomenda.concluida ? new Date().toISOString() : "";
+
+    await executarTransacao(STORE_ENCOMENDAS,"readwrite",(store)=>{
+        store.put(encomenda);
+    });
+
+    await carregarEncomendas();
+}
+
+async function excluirEncomenda(id){
+
+    if(!armazenamentoPronto()){
+        alert("O armazenamento ainda não foi iniciado.");
+        return;
+    }
+
+    if(!confirm("Deseja excluir esta encomenda?")) return;
+
+    await executarTransacao(STORE_ENCOMENDAS,"readwrite",(store)=>{
+        store.delete(id);
+    });
+
+    await carregarEncomendas();
 }
 
 document
