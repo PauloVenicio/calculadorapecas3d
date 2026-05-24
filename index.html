@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -429,10 +429,15 @@ const DB_VERSION = 2;
 
 const STORE_HISTORICO = "historico";
 const STORE_FILAMENTOS = "filamentos";
+const LS_KEYS = {
+    [STORE_HISTORICO]:"venix3d_historico",
+    [STORE_FILAMENTOS]:"venix3d_filamentos"
+};
 
 const LUCRO_FIXO = 120;
 
 let db = null;
+let usarLocalStorage = false;
 let historico = [];
 
 function lerNumero(id){
@@ -447,9 +452,69 @@ function formatarPeso(valor){
     return String(valor).replace(".",",");
 }
 
+function armazenamentoPronto(){
+
+    return db || usarLocalStorage;
+}
+
+function lerListaLocal(storeName){
+
+    try{
+        return JSON.parse(localStorage.getItem(LS_KEYS[storeName])) || [];
+    }catch(error){
+        console.error(error);
+        return [];
+    }
+}
+
+function salvarListaLocal(storeName,itens){
+
+    localStorage.setItem(LS_KEYS[storeName],JSON.stringify(itens));
+}
+
+function proximoId(itens){
+
+    if(itens.length === 0) return 1;
+
+    return Math.max(...itens.map(item=>Number(item.id) || 0)) + 1;
+}
+
 function executarTransacao(storeName, mode, callback){
 
     return new Promise((resolve,reject)=>{
+
+        if(usarLocalStorage){
+
+            try{
+                const itens = lerListaLocal(storeName);
+                const store = {
+                    add(item){
+                        itens.push({
+                            ...item,
+                            id:proximoId(itens)
+                        });
+                    },
+                    clear(){
+                        itens.length = 0;
+                    },
+                    delete(id){
+                        const index = itens.findIndex(item=>Number(item.id) === Number(id));
+
+                        if(index >= 0){
+                            itens.splice(index,1);
+                        }
+                    }
+                };
+
+                callback(store);
+                salvarListaLocal(storeName,itens);
+                resolve();
+            }catch(error){
+                reject(error);
+            }
+
+            return;
+        }
 
         const transaction = db.transaction(storeName,mode);
         const store = transaction.objectStore(storeName);
@@ -465,6 +530,11 @@ function executarTransacao(storeName, mode, callback){
 function buscarTodos(storeName){
 
     return new Promise((resolve,reject)=>{
+
+        if(usarLocalStorage){
+            resolve(lerListaLocal(storeName));
+            return;
+        }
 
         const transaction = db.transaction(storeName,"readonly");
         const store = transaction.objectStore(storeName);
@@ -484,7 +554,16 @@ async function abrirBanco(){
             return;
         }
 
-        const request = indexedDB.open(DB_NAME,DB_VERSION);
+        let request;
+
+        try{
+            request = indexedDB.open(DB_NAME,DB_VERSION);
+        }catch(error){
+            usarLocalStorage = true;
+            console.error(error);
+            resolve(null);
+            return;
+        }
 
         request.onupgradeneeded = (event)=>{
 
@@ -509,7 +588,11 @@ async function abrirBanco(){
 
         request.onsuccess = ()=>resolve(request.result);
 
-        request.onerror = ()=>reject(request.error);
+        request.onerror = ()=>{
+            usarLocalStorage = true;
+            console.error(request.error);
+            resolve(null);
+        };
     });
 }
 
@@ -517,18 +600,23 @@ async function inicializar(){
 
     try{
         db = await abrirBanco();
+    }catch(error){
+        usarLocalStorage = true;
+        console.error(error);
+    }
 
+    try{
         await carregarHistorico();
         await carregarFilamentos();
     }catch(error){
-        alert("Não foi possível iniciar o armazenamento local. Abra a página em um navegador atualizado e fora do modo privado.");
+        alert("Nao foi possivel carregar os dados salvos neste navegador.");
         console.error(error);
     }
 }
 
 async function calcular(){
 
-    if(!db){
+    if(!armazenamentoPronto()){
         alert("O armazenamento ainda não foi iniciado.");
         return;
     }
@@ -622,14 +710,14 @@ function atualizarHistorico(){
     [...historico].reverse().forEach(item=>{
 
         div.innerHTML += `
-            • ${item.texto}<br><br>
+            - ${item.texto}<br><br>
         `;
     });
 }
 
 async function limparHistorico(){
 
-    if(!db){
+    if(!armazenamentoPronto()){
         alert("O armazenamento ainda não foi iniciado.");
         return;
     }
@@ -649,7 +737,7 @@ async function limparHistorico(){
 
 async function salvarFilamento(){
 
-    if(!db){
+    if(!armazenamentoPronto()){
         alert("O armazenamento ainda não foi iniciado.");
         return;
     }
@@ -691,7 +779,7 @@ async function salvarFilamento(){
 
 async function excluirFilamento(id){
 
-    if(!db){
+    if(!armazenamentoPronto()){
         alert("O armazenamento ainda não foi iniciado.");
         return;
     }
@@ -815,7 +903,7 @@ async function carregarFilamentos(){
     for(let material in materiaisAbertos){
 
         htmlResumo += `
-            • ${material}: ${materiaisAbertos[material]} aberto(s)<br>
+            - ${material}: ${materiaisAbertos[material]} aberto(s)<br>
         `;
     }
 
@@ -830,7 +918,7 @@ async function carregarFilamentos(){
         for(let cor in coresAbertas){
 
             htmlResumo += `
-                • ${cor}: ${coresAbertas[cor]} aberto(s)<br>
+                - ${cor}: ${coresAbertas[cor]} aberto(s)<br>
             `;
         }
     }
@@ -845,7 +933,7 @@ async function carregarFilamentos(){
     for(let material in materiaisLacrados){
 
         htmlResumo += `
-            • ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
+            - ${material}: ${materiaisLacrados[material]} lacrado(s)<br>
         `;
     }
 
@@ -860,7 +948,7 @@ async function carregarFilamentos(){
         for(let cor in coresLacradas){
 
             htmlResumo += `
-                • ${cor}: ${coresLacradas[cor]} lacrado(s)<br>
+                - ${cor}: ${coresLacradas[cor]} lacrado(s)<br>
             `;
         }
     }
@@ -882,3 +970,4 @@ inicializar();
 
 </body>
 </html>
+
