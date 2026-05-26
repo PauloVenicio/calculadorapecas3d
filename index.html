@@ -189,7 +189,8 @@ button{
     margin-top:20px;
 }
 
-.social-links a{
+.social-links a,
+.social-links button{
     flex:1;
     text-align:center;
     text-decoration:none;
@@ -199,10 +200,12 @@ button{
     color:white;
     transition:0.3s;
     min-height:46px;
+    margin-top:0;
 }
 
 @media (hover:hover){
-    .social-links a:hover{
+    .social-links a:hover,
+    .social-links button:hover{
         transform:scale(1.03);
     }
 }
@@ -218,6 +221,11 @@ button{
 .ofertas{
     background:#ffd21f;
     color:#111933 !important;
+}
+
+.telegram{
+    background:linear-gradient(135deg,#37aee2,#1e96c8);
+    color:#fff;
 }
 
 .filamento-card{
@@ -313,6 +321,123 @@ hr{
     border-radius:10px;
     margin-bottom:10px;
     border:1px solid #1c274d;
+}
+
+.coffee-panel{
+    position:fixed;
+    right:18px;
+    bottom:calc(var(--footer-height) + 16px + env(safe-area-inset-bottom));
+    width:min(340px,calc(100vw - 36px));
+    background:#0d1429;
+    border:1px solid var(--primary);
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 10px 32px rgba(0,0,0,0.45);
+    z-index:21;
+}
+
+.stl-panel{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(380px,calc(100vw - 36px));
+    max-height:80vh;
+    overflow-y:auto;
+    background:#0d1429;
+    border:1px solid #37aee2;
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 10px 32px rgba(0,0,0,0.5);
+    z-index:22;
+}
+
+.coffee-panel[hidden],
+.stl-panel[hidden]{
+    display:none;
+}
+
+.coffee-panel p{
+    margin:0 0 10px;
+    line-height:1.4;
+}
+
+.coffee-key{
+    width:100%;
+    background:#111933;
+    border:1px solid #1c274d;
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+    font-weight:bold;
+    letter-spacing:0;
+    color:#fff;
+    font-size:16px;
+}
+
+.coffee-status{
+    min-height:18px;
+    margin:0 0 10px;
+    color:var(--primary);
+    font-size:13px;
+    line-height:1.35;
+}
+
+.coffee-actions{
+    display:flex;
+    gap:8px;
+}
+
+.coffee-actions button{
+    flex:1;
+    margin-top:0;
+}
+
+.coffee-close{
+    background:#1c274d;
+    color:#fff;
+}
+
+.stl-panel h3{
+    margin:0 0 12px;
+    color:var(--primary);
+    text-align:center;
+}
+
+.stl-link{
+    display:block;
+    width:100%;
+    background:#111933;
+    border:1px solid #1c274d;
+    border-radius:10px;
+    color:#fff;
+    text-decoration:none;
+    padding:12px;
+    margin-bottom:10px;
+}
+
+.stl-link strong{
+    display:block;
+    color:#37aee2;
+    margin-bottom:4px;
+}
+
+.stl-empty{
+    color:#d7e3ff;
+    line-height:1.4;
+}
+
+.footer-coffee{
+    width:auto;
+    min-height:30px;
+    padding:6px 10px;
+    margin:6px 0 0;
+    border-radius:8px;
+    background:#111933;
+    color:var(--primary);
+    border:1px solid rgba(0,242,255,0.45);
+    font-size:13px;
+    box-shadow:none;
 }
 
 @media (max-width:420px){
@@ -488,12 +613,48 @@ hr{
         Ofertas 3D
     </a>
 
+    <button
+    class="telegram"
+    type="button"
+    onclick="abrirGruposStl()">
+        Grupos de STL
+    </button>
+
 </div>
 
+</div>
+
+<div class="stl-panel" id="stlPanel" hidden>
+    <h3>Grupos de STL</h3>
+    <div id="stlLinks"></div>
+    <button class="coffee-close" type="button" onclick="fecharGruposStl()">
+        Fechar
+    </button>
+</div>
+
+<div class="coffee-panel" id="coffeePanel" hidden>
+    <p><strong>Pague um café ao seu dev favorito! :)</strong></p>
+    <p>Minha chave Pix:</p>
+    <input class="coffee-key" id="pixKey" value="paulocarvalho_costa@hotmail.com" readonly onclick="selecionarPix()">
+    <div class="coffee-status" id="coffeeStatus"></div>
+    <div class="coffee-actions">
+        <button class="btn-primary" type="button" onclick="copiarPix()">
+            Copiar Pix
+        </button>
+        <button class="coffee-close" type="button" onclick="fecharCafe()">
+            Fechar
+        </button>
+    </div>
 </div>
 
 <footer>
 Paulo Carvalho 2026 - Todos os direitos reservados.
+<button
+class="footer-coffee"
+type="button"
+onclick="abrirCafe()">
+    Café para o dev
+</button>
 </footer>
 
 <script>
@@ -509,6 +670,28 @@ const LS_KEYS = {
     [STORE_FILAMENTOS]:"venix3d_filamentos",
     [STORE_ENCOMENDAS]:"venix3d_encomendas"
 };
+const STL_GROUPS = [
+    {
+        nome:"Rede Stl/3mf Brasil",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/redestlbrasil"
+    },
+    {
+        nome:"STL do Solitário",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/STLsolitario"
+    },
+    {
+        nome:"PokemonSTL",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/PokemonSTL"
+    },
+    {
+        nome:"3D e STL SEM FREXCURA",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/impressoresbrasil"
+    }
+];
 
 const LUCRO_FIXO = 120;
 
@@ -1185,6 +1368,89 @@ async function excluirEncomenda(id){
     });
 
     await carregarEncomendas();
+}
+
+function abrirGruposStl(){
+
+    const panel = document.getElementById("stlPanel");
+    const links = document.getElementById("stlLinks");
+
+    if(STL_GROUPS.length === 0){
+        links.innerHTML = `
+            <p class="stl-empty">
+                Nenhum grupo cadastrado ainda. Envie os links dos grupos para eu colocar aqui.
+            </p>
+        `;
+    }else{
+        links.innerHTML = "";
+
+        STL_GROUPS.forEach(grupo=>{
+            links.innerHTML += `
+                <a
+                class="stl-link"
+                href="${escaparHtml(grupo.url)}"
+                target="_blank"
+                rel="noopener">
+                    <strong>${escaparHtml(grupo.nome)}</strong>
+                    ${escaparHtml(grupo.descricao || "Abrir grupo")}
+                </a>
+            `;
+        });
+    }
+
+    panel.hidden = false;
+}
+
+function fecharGruposStl(){
+
+    document.getElementById("stlPanel").hidden = true;
+}
+
+function abrirCafe(){
+
+    document.getElementById("coffeePanel").hidden = false;
+    document.getElementById("coffeeStatus").textContent = "";
+}
+
+function fecharCafe(){
+
+    document.getElementById("coffeePanel").hidden = true;
+}
+
+function selecionarPix(){
+
+    const input = document.getElementById("pixKey");
+    const chave = input.value.trim();
+
+    input.focus();
+    input.select();
+    input.setSelectionRange(0,chave.length);
+}
+
+async function copiarPix(){
+
+    const input = document.getElementById("pixKey");
+    const status = document.getElementById("coffeeStatus");
+    const chave = input.value.trim();
+
+    selecionarPix();
+
+    try{
+        if(navigator.clipboard){
+            await navigator.clipboard.writeText(chave);
+        }else{
+            const copiado = document.execCommand("copy");
+
+            if(!copiado){
+                throw new Error("Copia bloqueada pelo navegador.");
+            }
+        }
+
+        status.textContent = "Chave Pix copiada.";
+    }catch(error){
+        console.error(error);
+        status.textContent = "Cópia automática bloqueada. A chave ficou selecionada: toque e segure nela, depois escolha Copiar.";
+    }
 }
 
 document
