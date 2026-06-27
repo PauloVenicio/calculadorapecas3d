@@ -228,6 +228,11 @@ button{
     color:#fff;
 }
 
+.web-utils{
+    background:linear-gradient(135deg,#00f2ff,#22c55e);
+    color:#06140b !important;
+}
+
 .filamento-card{
     background:#0d1429;
     padding:14px 56px 14px 14px;
@@ -336,7 +341,8 @@ hr{
     z-index:21;
 }
 
-.stl-panel{
+.stl-panel,
+.utils-panel{
     position:fixed;
     left:50%;
     top:50%;
@@ -353,7 +359,8 @@ hr{
 }
 
 .coffee-panel[hidden],
-.stl-panel[hidden]{
+.stl-panel[hidden],
+.utils-panel[hidden]{
     display:none;
 }
 
@@ -398,13 +405,15 @@ hr{
     color:#fff;
 }
 
-.stl-panel h3{
+.stl-panel h3,
+.utils-panel h3{
     margin:0 0 12px;
     color:var(--primary);
     text-align:center;
 }
 
-.stl-link{
+.stl-link,
+.utils-link{
     display:block;
     width:100%;
     background:#111933;
@@ -416,7 +425,8 @@ hr{
     margin-bottom:10px;
 }
 
-.stl-link strong{
+.stl-link strong,
+.utils-link strong{
     display:block;
     color:#37aee2;
     margin-bottom:4px;
@@ -622,12 +632,27 @@ hr{
 
 </div>
 
+<button
+class="web-utils"
+type="button"
+onclick="abrirUtilitariosWeb()">
+    Utilitários 3D Web
+</button>
+
 </div>
 
 <div class="stl-panel" id="stlPanel" hidden>
     <h3>Grupos de STL</h3>
     <div id="stlLinks"></div>
     <button class="coffee-close" type="button" onclick="fecharGruposStl()">
+        Fechar
+    </button>
+</div>
+
+<div class="utils-panel" id="utilsPanel" hidden>
+    <h3>Utilitários 3D Web</h3>
+    <div id="utilsLinks"></div>
+    <button class="coffee-close" type="button" onclick="fecharUtilitariosWeb()">
         Fechar
     </button>
 </div>
@@ -715,6 +740,63 @@ const STL_GROUPS = [
         nome:"EVERY STL",
         descricao:"Grupo no Telegram",
         url:"https://t.me/GroupSTL"
+    },
+    {
+        nome:"Mortal Kombat bonecos",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/MortalKombatstl"
+    },
+    {
+        nome:"3D Makers",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/makersnew"
+    },
+    {
+        nome:"3D Bonecos",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/triDmodeling"
+    },
+    {
+        nome:"3D Pixel STL",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/Pixel_3D_STL"
+    },
+    {
+        nome:"3D Dioramas",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/miniatures_all"
+    },
+    {
+        nome:"Marvel STL",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/MarvelSTL"
+    },
+    {
+        nome:"DC STL",
+        descricao:"Grupo no Telegram",
+        url:"https://t.me/DCSTL"
+    }
+];
+const WEB_UTILS = [
+    {
+        nome:"Thingiverse",
+        descricao:"Biblioteca de modelos 3D",
+        url:"https://www.thingiverse.com/"
+    },
+    {
+        nome:"Convertio",
+        descricao:"Converter PNG para SVG",
+        url:"https://convertio.co/pt/png-svg/"
+    },
+    {
+        nome:"Meshy",
+        descricao:"Ferramenta 3D com IA",
+        url:"https://www.meshy.ai/pt-BR/discover"
+    },
+    {
+        nome:"Tinkercad",
+        descricao:"Modelagem 3D online",
+        url:"https://www.tinkercad.com/"
     }
 ];
 
@@ -1429,6 +1511,34 @@ function abrirGruposStl(){
 function fecharGruposStl(){
 
     document.getElementById("stlPanel").hidden = true;
+}
+
+function abrirUtilitariosWeb(){
+
+    const panel = document.getElementById("utilsPanel");
+    const links = document.getElementById("utilsLinks");
+
+    links.innerHTML = "";
+
+    WEB_UTILS.forEach(utilitario=>{
+        links.innerHTML += `
+            <a
+            class="utils-link"
+            href="${escaparHtml(utilitario.url)}"
+            target="_blank"
+            rel="noopener">
+                <strong>${escaparHtml(utilitario.nome)}</strong>
+                ${escaparHtml(utilitario.descricao || "Abrir site")}
+            </a>
+        `;
+    });
+
+    panel.hidden = false;
+}
+
+function fecharUtilitariosWeb(){
+
+    document.getElementById("utilsPanel").hidden = true;
 }
 
 function abrirCafe(){
